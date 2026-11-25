@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Profile{% endblock %}
+{% block page_title %}Administrator Profile{% endblock %}
+
+{% block content %}
+<div class="page-content-wrapper">
+    <!-- Breadcrumb & Action Banner -->
+    <div class="content-header-bar">
+        <div class="header-text-group">
+            <h2 class="section-title">Admin Account Management</h2>
+            <p class="section-subtitle">View and update your administrator credentials, email address, and personal information</p>
+        </div>
+        <div class="header-action-group">
+            <a href="{{ url_for('change_password') }}" class="btn btn-outline-primary">
+                <span>🔑</span>
+                <span>Change Password</span>
+            </a>
+            <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+                <span>📊</span>
+                <span>Return to Dashboard</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Profile Grid Layout -->
+    <div class="profile-layout-grid">
+        <!-- Column 1: Identity Card -->
+        <div class="profile-card profile-summary-card">
+            <div class="profile-avatar-wrapper">
+                <div class="profile-avatar-circle">
+                    <span class="avatar-emoji">🛡️</span>
+                </div>
+                <h3 class="profile-display-name">{{ admin.full_name or 'Store Administrator' }}</h3>
+                <span class="profile-role-pill">{{ admin.role or 'Admin' }}</span>
+                <p class="profile-username-tag">@{{ admin.username }}</p>
+            </div>
+
+            <div class="profile-meta-divider"></div>
+
+            <div class="profile-meta-list">
+                <div class="profile-meta-item">
+                    <span class="meta-label">📧 Email Address</span>
+                    <span class="meta-value">{{ admin.email or 'admin@soundcraft.com' }}</span>
+                </div>
+                <div class="profile-meta-item">
+                    <span class="meta-label">🆔 Admin Account ID</span>
+                    <span class="meta-value">#{{ admin.user_id }}</span>
+                </div>
+                <div class="profile-meta-item">
+                    <span class="meta-label">🔒 Security Standard</span>
+                    <span class="meta-value text-success">PBKDF2-SHA256 (Protected)</span>
+                </div>
+                <div class="profile-meta-item">
+                    <span class="meta-label">📅 Registered Since</span>
+                    <span class="meta-value">{{ admin.created_at or 'System Launch' }}</span>
+                </div>
+            </div>
+
+            <div class="profile-quick-action-box">
+                <a href="{{ url_for('change_password') }}" class="btn btn-primary btn-block">
+                    <span>🔑 Update Password</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Column 2: Profile Edit Form -->
+        <div class="profile-card profile-edit-card">
+            <div class="card-header-styled">
+                <div class="card-icon-box">✏️</div>
+                <div>
+                    <h3 class="card-heading">Edit Profile Information</h3>
+                    <p class="card-subheading">Update your administrator profile details. Changes reflect immediately across the dashboard.</p>
+                </div>
+            </div>
+
+            <form action="{{ url_for('profile') }}" method="POST" class="styled-form profile-form" novalidate>
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="full_name" class="form-label">
+                        <span>Full Name</span>
+                        <span class="required-star">*</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">👤</span>
+                        <input 
+                            type="text" 
+                            id="full_name" 
+                            name="full_name" 
+                            class="form-control" 
+                            placeholder="e.g. Master Administrator"
+                            value="{{ admin.full_name or '' }}"
+                            required
+                        >
+                    </div>
+                    <small class="form-hint">Your legal name or store administrator title.</small>
+                </div>
+
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        <span>Username</span>
+                        <span class="required-star">*</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">🏷️</span>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-control" 
+                            placeholder="e.g. admin"
+                            value="{{ admin.username or '' }}"
+                            required
+                        >
+                    </div>
+                    <small class="form-hint">Used to sign in to the administration portal. Must be unique.</small>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <span>Email Address</span>
+                        <span class="required-star">*</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">✉️</span>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-control" 
+                            placeholder="e.g. admin@soundcraft.com"
+                            value="{{ admin.email or '' }}"
+                            required
+                        >
+                    </div>
+                    <small class="form-hint">Used for password recovery and system security alerts.</small>
+                </div>
+
+                <!-- Role (Read Only) -->
+                <div class="form-group">
+                    <label class="form-label">Assigned Role</label>
+                    <div class="input-with-icon input-disabled">
+                        <span class="input-icon">🛡️</span>
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            value="{{ admin.role or 'Admin' }} (Full Access)" 
+                            disabled 
+                            readonly
+                        >
+                    </div>
+                    <small class="form-hint">The primary administrator role cannot be altered.</small>
+                </div>
+
+                <div class="form-actions-row">
+                    <button type="submit" class="btn btn-primary btn-save">
+                        <span>💾 Save Profile Changes</span>
+                    </button>
+                    <a href="{{ url_for('profile') }}" class="btn btn-secondary">
+                        <span>↩️ Discard Changes</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

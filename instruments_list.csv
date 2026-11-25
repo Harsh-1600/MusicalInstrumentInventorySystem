@@ -1,0 +1,31 @@
+ID,Instrument Name,Category,Brand,Price (INR),Stock,Status
+INS001,Guitar,String Instruments,Yamaha,8500.00,10,In Stock
+INS002,Piano,Keyboard Instruments,Casio,45000.00,10,In Stock
+INS003,Violin,String Instruments,Stentor,12000.00,10,In Stock
+INS004,Drum Kit,Percussion Instruments,Pearl,35000.00,4,Low Stock
+INS005,Flute,Wind Instruments,Yamaha,2500.00,0,Out of Stock
+INS006,Keyboard,Keyboard Instruments,Roland,18000.00,7,In Stock
+INS007,Ukulele,String Instruments,Kadence,3500.00,12,In Stock
+INS008,Saxophone,Wind Instruments,Jupiter,28000.00,3,Low Stock
+INS009,Trumpet,Wind Instruments,Bach,22000.00,6,In Stock
+INS010,Cello,String Instruments,Yamaha,65000.00,2,Low Stock
+INS011,Tabla,Percussion Instruments,Radhe,4500.00,10,In Stock
+INS012,Mridangam,Percussion Instruments,Handmade,7000.00,5,Low Stock
+INS013,Clarinet,Wind Instruments,Yamaha,15000.00,4,Low Stock
+INS014,Harmonica,Wind Instruments,Hohner,1200.00,20,In Stock
+INS015,Banjo,String Instruments,Deering,18000.00,3,Low Stock
+INS016,Mandolin,String Instruments,Ibanez,9500.00,6,In Stock
+INS017,Electric Guitar,String Instruments,Fender,25000.00,5,Low Stock
+INS018,Bass Guitar,String Instruments,Ibanez,22000.00,0,Out of Stock
+INS019,Djembe,Percussion Instruments,Meinl,6000.00,7,In Stock
+INS020,Conga,Percussion Instruments,LP,14000.00,3,Low Stock
+INS021,Xylophone,Percussion Instruments,Yamaha,8500.00,5,Low Stock
+INS022,Accordion,Keyboard Instruments,Hohner,32000.00,2,Low Stock
+INS023,Organ,Keyboard Instruments,Yamaha,55000.00,2,Low Stock
+INS024,Oboe,Wind Instruments,Yamaha,38000.00,2,Low Stock
+INS025,Trombone,Wind Instruments,Bach,26000.00,3,Low Stock
+INS026,Tuba,Wind Instruments,Jupiter,48000.00,2,Low Stock
+INS027,Sitar,String Instruments,Handmade,18000.00,3,Low Stock
+INS028,Veena,String Instruments,Saraswati,15000.00,5,Low Stock
+INS029,Tambourine,Percussion Instruments,Meinl,1800.00,12,In Stock
+INS030,Triangle,Percussion Instruments,Stagg,900.00,15,In Stock

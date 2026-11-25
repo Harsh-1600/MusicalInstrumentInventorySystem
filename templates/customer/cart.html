@@ -1,0 +1,143 @@
+{% extends "customer/base_customer.html" %}
+
+{% block title %}Shopping Cart - SoundCraft Store{% endblock %}
+
+{% block content %}
+<div class="store-container">
+    <!-- Header Bar -->
+    <div class="content-header-bar" style="margin-bottom: 24px;">
+        <div class="header-text-group">
+            <h2 class="section-title">🛒 My Shopping Cart</h2>
+            <p class="section-subtitle">Review items in your cart before proceeding to safe delivery checkout</p>
+        </div>
+        <div class="header-action-group">
+            <a href="{{ url_for('customer_store') }}" class="btn btn-outline-secondary">
+                <span>🛍️ Continue Browsing</span>
+            </a>
+            {% if cart_items %}
+            <form action="{{ url_for('customer_cart_clear') }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to clear your cart?');">
+                <button type="submit" class="btn btn-outline-danger">
+                    <span>🗑️ Clear Cart</span>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if cart_items %}
+    <div class="checkout-layout-grid">
+        <!-- Cart Items List -->
+        <div class="checkout-form-column">
+            <div class="cart-items-container">
+                {% for item in cart_items %}
+                <div class="cart-item-card">
+                    <!-- Thumbnail -->
+                    <div class="cart-item-thumb-box">
+                        <img 
+                            src="{% if item.image_url.startswith('/') or item.image_url.startswith('http') %}{{ item.image_url }}{% elif item.image_url.startswith('static/') %}/{{ item.image_url }}{% else %}{{ url_for('static', filename=item.image_url) }}{% endif %}" 
+                            alt="{{ item.name }}"
+                            class="cart-thumb"
+                        >
+                    </div>
+
+                    <!-- Details -->
+                    <div class="cart-item-details">
+                        <div class="cart-item-brand">{{ item.brand }} &bull; {{ item.category }}</div>
+                        <h4 class="cart-item-title">
+                            <a href="{{ url_for('customer_instrument_detail', instrument_id=item.instrument_id) }}">
+                                {{ item.name }}
+                            </a>
+                        </h4>
+                        <div class="cart-item-unit-price">
+                            Unit Price: <strong>₹{{ "{:,.2f}".format(item.price) }}</strong>
+                        </div>
+
+                        {% if item.is_out_of_stock %}
+                        <div class="text-danger font-bold" style="font-size: 0.85rem; margin-top: 4px;">
+                            ⚠️ Currently Out of Stock. Please remove to checkout.
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Quantity Control -->
+                    <div class="cart-item-qty-control">
+                        <form action="{{ url_for('customer_cart_update') }}" method="POST" class="cart-qty-form">
+                            <input type="hidden" name="instrument_id" value="{{ item.instrument_id }}">
+                            <div class="qty-stepper-wrap">
+                                <button type="submit" name="action" value="decrease" class="btn-stepper" title="Decrease">&minus;</button>
+                                <span class="cart-qty-display">{{ item.cart_quantity }}</span>
+                                <button type="submit" name="action" value="increase" class="btn-stepper" title="Increase" {% if item.cart_quantity >= item.quantity %}disabled{% endif %}>+</button>
+                            </div>
+                        </form>
+                        <small class="cart-stock-note">({{ item.quantity }} in stock)</small>
+                    </div>
+
+                    <!-- Subtotal & Remove -->
+                    <div class="cart-item-subtotal-box">
+                        <div class="cart-item-subtotal">₹{{ "{:,.2f}".format(item.subtotal) }}</div>
+                        <form action="{{ url_for('customer_cart_update') }}" method="POST">
+                            <input type="hidden" name="instrument_id" value="{{ item.instrument_id }}">
+                            <input type="hidden" name="action" value="remove">
+                            <button type="submit" class="btn-cart-remove" title="Remove Item">
+                                <span>✕ Remove</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Cart Summary & Checkout Sidebar -->
+        <div class="checkout-summary-column">
+            <div class="order-summary-card">
+                <h3 class="order-summary-title">Cart Summary</h3>
+
+                <div class="summary-calc-rows">
+                    <div class="calc-row">
+                        <span>Total Items</span>
+                        <span><strong>{{ total_count }} unit(s)</strong></span>
+                    </div>
+                    <div class="calc-row">
+                        <span>Items Subtotal</span>
+                        <span>₹{{ "{:,.2f}".format(grand_total) }}</span>
+                    </div>
+                    <div class="calc-row text-success">
+                        <span>Express Delivery</span>
+                        <span><strong>FREE (₹0.00)</strong></span>
+                    </div>
+                    <div class="calc-row calc-total-row">
+                        <span>Grand Total</span>
+                        <span class="calc-grand-total">₹{{ "{:,.2f}".format(grand_total) }}</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 24px;">
+                    <a href="{{ url_for('customer_cart_checkout') }}" class="btn btn-confirm-order btn-block" style="text-align: center; text-decoration: none;">
+                        <span>🚀 Proceed to Checkout &rarr;</span>
+                    </a>
+                </div>
+
+                <div class="summary-safety-box" style="margin-top: 20px;">
+                    <div class="safety-icon">🛡️</div>
+                    <div class="safety-text">
+                        <strong>SoundCraft Quality Guarantee:</strong>
+                        Includes factory tuning, original warranty certificate, and doorstep setup support.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="store-empty-state">
+        <div class="empty-icon">🛒</div>
+        <h3 class="empty-title">Your Cart is Currently Empty</h3>
+        <p class="empty-desc">You haven't added any musical instruments to your cart yet. Explore our handcrafted collection of guitars, violins, pianos, drums, and flutes!</p>
+        <a href="{{ url_for('customer_store') }}" class="btn btn-primary" style="margin-top: 18px;">
+            <span>🛍️ Explore Instrument Catalog</span>
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

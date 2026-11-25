@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad_f472b6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#701a75" />
+      <stop offset="100%" stop-color="#86198f" />
+    </linearGradient>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#cbd5e1" />
+      <stop offset="100%" stop-color="#94a3b8" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="400" height="300" rx="16" fill="url(#grad_f472b6)" />
+
+  <!-- Background decorative rings -->
+  <circle cx="200" cy="140" r="110" fill="none" stroke="#f472b6" stroke-opacity="0.15" stroke-width="2" />
+  <circle cx="200" cy="140" r="85" fill="none" stroke="#f472b6" stroke-opacity="0.2" stroke-width="1.5" stroke-dasharray="6,4" />
+
+  <!-- Instrument Artwork -->
+  <g filter="url(#shadow)">
+    
+          <!-- Bayan (Metal Bass Drum - Left) -->
+          <ellipse cx="145" cy="155" rx="42" ry="32" fill="#d97706" stroke="#fde68a" stroke-width="2"/>
+          <ellipse cx="145" cy="140" rx="38" ry="18" fill="#f8fafc" stroke="#78350f" stroke-width="2"/>
+          <!-- Syahi (Black center on Bayan - off center) -->
+          <circle cx="140" cy="138" r="14" fill="#18181b" stroke="#71717a" stroke-width="1.5"/>
+          <!-- Wooden Base Ring -->
+          <ellipse cx="145" cy="185" rx="32" ry="8" fill="#a21caf"/>
+
+          <!-- Dayan (Wood Treble Drum - Right) -->
+          <ellipse cx="245" cy="160" rx="36" ry="34" fill="#9a3412" stroke="#fed7aa" stroke-width="2"/>
+          <ellipse cx="245" cy="140" rx="32" ry="16" fill="#f8fafc" stroke="#7c2d12" stroke-width="2"/>
+          <!-- Syahi (Center circle on Dayan) -->
+          <circle cx="245" cy="140" r="12" fill="#18181b" stroke="#71717a" stroke-width="1.5"/>
+          <!-- Gatta tuning pegs -->
+          <rect x="278" y="160" width="7" height="14" rx="2" fill="#fde047"/>
+          <rect x="210" y="160" width="7" height="14" rx="2" fill="#fde047"/>
+          <!-- Bira / Cushion Rings -->
+          <ellipse cx="245" cy="190" rx="28" ry="8" fill="#a21caf"/>
+        
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="20" y="246" width="360" height="38" rx="8" fill="rgba(15, 23, 42, 0.75)" backdrop-filter="blur(4px)" />
+  <text x="200" y="270" font-family="'Segoe UI', -apple-system, sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">
+    TABLA & INDIAN PERCUSSION
+  </text>
+</svg>

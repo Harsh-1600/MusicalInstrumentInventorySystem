@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Overview{% endblock %}
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Welcome Notice -->
+    <div class="welcome-banner">
+        <div class="banner-text">
+            <h2>Welcome to the Musical Instrument Inventory System 🎵</h2>
+            <p>Real-time overview of instruments, stock levels, valuations, and category distributions.</p>
+        </div>
+        <div class="banner-badge">
+            <span class="pulse-indicator"></span> Real SQLite Connected
+        </div>
+    </div>
+
+    <!-- Summary Metrics Cards Grid -->
+    <section class="cards-grid">
+        <!-- Card 1: Total Instruments -->
+        <div class="summary-card card-blue">
+            <div class="card-icon-wrapper">
+                <span class="card-emoji">🎸</span>
+            </div>
+            <div class="card-content">
+                <span class="card-label">Total Instruments</span>
+                <h3 class="card-value">{{ stats.total_instruments }}</h3>
+                <span class="card-desc">Unique catalog models</span>
+            </div>
+        </div>
+
+        <!-- Card 2: Total Stock Quantity -->
+        <div class="summary-card card-amber">
+            <div class="card-icon-wrapper">
+                <span class="card-emoji">📦</span>
+            </div>
+            <div class="card-content">
+                <span class="card-label">Total Stock Quantity</span>
+                <h3 class="card-value">{{ stats.total_quantity }}</h3>
+                <span class="card-desc">Units in warehouse</span>
+            </div>
+        </div>
+
+        <!-- Card 3: Total Inventory Value -->
+        <div class="summary-card card-green">
+            <div class="card-icon-wrapper">
+                <span class="card-emoji">💰</span>
+            </div>
+            <div class="card-content">
+                <span class="card-label">Total Inventory Value</span>
+                <h3 class="card-value">${{ "%.2f"|format(stats.total_inventory_value) }}</h3>
+                <span class="card-desc">Calculated as (price &times; stock)</span>
+            </div>
+        </div>
+
+        <!-- Card 4: Total Sales Amount -->
+        <div class="summary-card card-purple">
+            <div class="card-icon-wrapper">
+                <span class="card-emoji">📈</span>
+            </div>
+            <div class="card-content">
+                <span class="card-label">Total Sales</span>
+                <h3 class="card-value">${{ "%.2f"|format(stats.total_sales) }}</h3>
+                <span class="card-desc">Cumulative revenue generated</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Two-Column Section: Recent Instruments & Low Stock Alerts -->
+    <div class="dashboard-grid-split">
+        <!-- Left Column: Recent Instruments Table -->
+        <div class="panel main-panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <span class="panel-icon">📋</span>
+                    <h3>Recent Instruments</h3>
+                </div>
+                <span class="panel-subtext">Latest catalog additions</span>
+            </div>
+
+            <div class="panel-body">
+                {% if stats.recent_instruments and stats.recent_instruments|length > 0 %}
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Brand</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for inst in stats.recent_instruments %}
+                            <tr>
+                                <td class="col-id">{% if inst['instrument_id']|string|first in '0123456789' %}#{{ inst['instrument_id'] }}{% else %}{{ inst['instrument_id'] }}{% endif %}</td>
+                                <td class="col-name"><strong>{{ inst['name'] }}</strong></td>
+                                <td><span class="tag-category">{{ inst['category'] }}</span></td>
+                                <td>{{ inst['brand'] }}</td>
+                                <td class="col-price">${{ "%.2f"|format(inst['price']) }}</td>
+                                <td class="col-qty">{{ inst['quantity'] }}</td>
+                                <td>
+                                    {% if inst['quantity'] == 0 %}
+                                    <span class="badge-status badge-out">Out of Stock</span>
+                                    {% elif inst['quantity'] <= 5 %}
+                                    <span class="badge-status badge-low">Low Stock</span>
+                                    {% else %}
+                                    <span class="badge-status badge-in">In Stock</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🎺</div>
+                    <h4>No Instruments in Inventory</h4>
+                    <p>The database is currently empty. Instruments added in future steps will appear here automatically.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column: Low Stock Alerts & Category Overview -->
+        <div class="panel-sidebar-stack">
+            <!-- Low Stock Alert Section -->
+            <div class="panel alert-panel">
+                <div class="panel-header">
+                    <div class="panel-title-group">
+                        <span class="panel-icon">⚠️</span>
+                        <h3>Low Stock Alerts</h3>
+                    </div>
+                    <span class="badge-count">{{ stats.low_stock_instruments|length }}</span>
+                </div>
+
+                <div class="panel-body">
+                    {% if stats.low_stock_instruments and stats.low_stock_instruments|length > 0 %}
+                    <ul class="alert-list">
+                        {% for item in stats.low_stock_instruments %}
+                        <li class="alert-item">
+                            <div class="alert-info">
+                                <span class="alert-name">{{ item['name'] }}</span>
+                                <span class="alert-meta">{{ item['brand'] }} &bull; {{ item['category'] }}</span>
+                            </div>
+                            <div class="alert-qty-badge {% if item['quantity'] == 0 %}out-of-stock{% else %}crit-stock{% endif %}">
+                                {{ item['quantity'] }} units left
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="empty-state-mini">
+                        <span class="check-icon">✅</span>
+                        <p>No low stock warnings. All items have 5+ units or database is fresh.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Category-wise Overview Section -->
+            <div class="panel category-panel">
+                <div class="panel-header">
+                    <div class="panel-title-group">
+                        <span class="panel-icon">🏷️</span>
+                        <h3>Category Overview</h3>
+                    </div>
+                    <span class="panel-subtext">Distribution</span>
+                </div>
+
+                <div class="panel-body">
+                    {% if stats.category_summary and stats.category_summary|length > 0 %}
+                    <ul class="category-list">
+                        {% for cat in stats.category_summary %}
+                        <li class="category-item">
+                            <div class="cat-left">
+                                <span class="cat-bullet">🎼</span>
+                                <span class="cat-name">{{ cat['category'] }}</span>
+                            </div>
+                            <div class="cat-stats">
+                                <span class="cat-items">{{ cat['item_count'] }} types</span>
+                                <span class="cat-units">{{ cat['total_stock'] }} units</span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <div class="empty-state-mini">
+                        <span class="check-icon">🎻</span>
+                        <p>No category breakdown available yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

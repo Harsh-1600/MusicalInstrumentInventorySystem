@@ -1,0 +1,83 @@
+{% extends "customer/base_customer.html" %}
+
+{% block title %}My Orders - SoundCraft Store{% endblock %}
+
+{% block content %}
+<div class="store-container">
+    <!-- Header Bar -->
+    <div class="content-header-bar" style="margin-bottom: 24px;">
+        <div class="header-text-group">
+            <h2 class="section-title">📦 My Orders &amp; Purchase History</h2>
+            <p class="section-subtitle">Track your instrument orders, view delivery status, and download digital invoices</p>
+        </div>
+        <div class="header-action-group">
+            <a href="{{ url_for('customer_store') }}" class="btn btn-outline-primary">
+                <span>🛍️ Browse Store</span>
+            </a>
+            <a href="{{ url_for('customer_profile') }}" class="btn btn-outline-secondary">
+                <span>👤 My Profile</span>
+            </a>
+        </div>
+    </div>
+
+    {% if orders %}
+    <div class="orders-list-wrapper">
+        {% for o in orders %}
+        <div class="order-card-tile">
+            <div class="order-tile-header">
+                <div class="order-tile-meta">
+                    <span class="order-tile-number">#{{ o.order_number }}</span>
+                    <span class="order-tile-dot">&bull;</span>
+                    <span class="order-tile-date">Placed on {{ o.created_at }}</span>
+                </div>
+                <div class="order-tile-status-wrap">
+                    <span class="order-status-badge status-{{ o.order_status|lower }}">
+                        <span class="status-dot"></span>
+                        <span>{{ o.order_status }}</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="order-tile-body">
+                <div class="order-tile-items-desc">
+                    <div class="order-desc-label">Purchased Instruments:</div>
+                    <div class="order-desc-text">{{ o.items_summary or 'Custom Instrument Order' }}</div>
+                </div>
+
+                <div class="order-tile-delivery">
+                    <div class="order-desc-label">Delivery Address:</div>
+                    <div class="order-delivery-address">{{ o.shipping_address }}, {{ o.city }} ({{ o.pincode }})</div>
+                </div>
+
+                <div class="order-tile-financials">
+                    <div class="order-amount-group">
+                        <span class="order-amount-label">Total Amount:</span>
+                        <span class="order-amount-val">₹{{ "{:,.2f}".format(o.total_amount) }}</span>
+                    </div>
+                    <div class="order-pay-method">
+                        <span>Payment:</span> <strong>{{ o.payment_method }}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-tile-footer">
+                <a href="{{ url_for('customer_order_receipt', order_id=o.order_id) }}" class="btn btn-outline-primary btn-sm">
+                    <span>📄 View &amp; Print Invoice</span>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="store-empty-state">
+        <div class="empty-icon">📦</div>
+        <h3 class="empty-title">You Haven't Placed Any Orders Yet</h3>
+        <p class="empty-desc">Discover our catalog of handcrafted guitars, pianos, drum kits, violins, and traditional instruments ready for immediate delivery.</p>
+        <a href="{{ url_for('customer_store') }}" class="btn btn-primary" style="margin-top: 18px;">
+            <span>🛍️ Start Shopping Now</span>
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

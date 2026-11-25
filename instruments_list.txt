@@ -1,0 +1,42 @@
+==========================================================================================
+                   SOUNDCRAFT MUSICAL INSTRUMENT INVENTORY
+                             COMPLETE CATALOG
+==========================================================================================
+
+Total Instruments : 30
+Catalog Currency  : INR (Rs.)
+
+------------------------------------------------------------------------------------------
+ID       | Instrument Name                    | Category                 | Brand        | Price       | Stock
+------------------------------------------------------------------------------------------
+INS001   | Guitar                             | String Instruments       | Yamaha       | Rs.8500.00  | 10
+INS002   | Piano                              | Keyboard Instruments     | Casio        | Rs.45000.00 | 10
+INS003   | Violin                             | String Instruments       | Stentor      | Rs.12000.00 | 10
+INS004   | Drum Kit                           | Percussion Instruments   | Pearl        | Rs.35000.00 | 4
+INS005   | Flute                              | Wind Instruments         | Yamaha       | Rs.2500.00  | 0
+INS006   | Keyboard                           | Keyboard Instruments     | Roland       | Rs.18000.00 | 7
+INS007   | Ukulele                            | String Instruments       | Kadence      | Rs.3500.00  | 12
+INS008   | Saxophone                          | Wind Instruments         | Jupiter      | Rs.28000.00 | 3
+INS009   | Trumpet                            | Wind Instruments         | Bach         | Rs.22000.00 | 6
+INS010   | Cello                              | String Instruments       | Yamaha       | Rs.65000.00 | 2
+INS011   | Tabla                              | Percussion Instruments   | Radhe        | Rs.4500.00  | 10
+INS012   | Mridangam                          | Percussion Instruments   | Handmade     | Rs.7000.00  | 5
+INS013   | Clarinet                           | Wind Instruments         | Yamaha       | Rs.15000.00 | 4
+INS014   | Harmonica                          | Wind Instruments         | Hohner       | Rs.1200.00  | 20
+INS015   | Banjo                              | String Instruments       | Deering      | Rs.18000.00 | 3
+INS016   | Mandolin                           | String Instruments       | Ibanez       | Rs.9500.00  | 6
+INS017   | Electric Guitar                    | String Instruments       | Fender       | Rs.25000.00 | 5
+INS018   | Bass Guitar                        | String Instruments       | Ibanez       | Rs.22000.00 | 0
+INS019   | Djembe                             | Percussion Instruments   | Meinl        | Rs.6000.00  | 7
+INS020   | Conga                              | Percussion Instruments   | LP           | Rs.14000.00 | 3
+INS021   | Xylophone                          | Percussion Instruments   | Yamaha       | Rs.8500.00  | 5
+INS022   | Accordion                          | Keyboard Instruments     | Hohner       | Rs.32000.00 | 2
+INS023   | Organ                              | Keyboard Instruments     | Yamaha       | Rs.55000.00 | 2
+INS024   | Oboe                               | Wind Instruments         | Yamaha       | Rs.38000.00 | 2
+INS025   | Trombone                           | Wind Instruments         | Bach         | Rs.26000.00 | 3
+INS026   | Tuba                               | Wind Instruments         | Jupiter      | Rs.48000.00 | 2
+INS027   | Sitar                              | String Instruments       | Handmade     | Rs.18000.00 | 3
+INS028   | Veena                              | String Instruments       | Saraswati    | Rs.15000.00 | 5
+INS029   | Tambourine                         | Percussion Instruments   | Meinl        | Rs.1800.00  | 12
+INS030   | Triangle                           | Percussion Instruments   | Stagg        | Rs.900.00   | 15
+------------------------------------------------------------------------------------------

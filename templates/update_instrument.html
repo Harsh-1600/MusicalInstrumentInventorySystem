@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Update Instrument {% if instrument['instrument_id']|string|first in '0123456789' %}#{{ instrument['instrument_id'] }}{% else %}{{ instrument['instrument_id'] }}{% endif %}{% endblock %}
+{% block page_title %}Update Instrument {% if instrument['instrument_id']|string|first in '0123456789' %}#{{ instrument['instrument_id'] }}{% else %}{{ instrument['instrument_id'] }}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="form-container-wrapper">
+    <div class="form-card">
+        <div class="form-card-header">
+            <div class="header-icon">✏️</div>
+            <div>
+                <h3>Update Instrument Details</h3>
+                <p class="form-subtitle">Modify instrument information, pricing, or stock units. Instrument ID cannot be changed.</p>
+            </div>
+        </div>
+
+        <form action="{{ url_for('edit_instrument', instrument_id=instrument['instrument_id']) }}" method="POST" class="instrument-form" novalidate>
+            <!-- Hidden Instrument ID to ensure safety -->
+            <input type="hidden" name="instrument_id" value="{{ instrument['instrument_id'] }}">
+
+            <div class="form-grid">
+                <!-- Field 1: Instrument ID (Read-only) -->
+                <div class="form-group">
+                    <label for="instrument_id_display" class="form-label">
+                        Instrument ID (Fixed)
+                    </label>
+                    <input 
+                        type="text" 
+                        id="instrument_id_display" 
+                        class="form-control input-readonly" 
+                        value="{% if instrument['instrument_id']|string|first in '0123456789' %}#{{ instrument['instrument_id'] }}{% else %}{{ instrument['instrument_id'] }}{% endif %}"
+                        readonly
+                        disabled
+                    >
+                    <span class="form-hint">Primary Key in database (non-editable).</span>
+                </div>
+
+                <!-- Field 2: Instrument Name -->
+                <div class="form-group">
+                    <label for="name" class="form-label">
+                        Instrument Name <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        class="form-control" 
+                        placeholder="e.g., Fender Stratocaster" 
+                        value="{{ instrument['name'] }}"
+                        required
+                    >
+                    <span class="form-hint">Full model and product name.</span>
+                </div>
+
+                <!-- Field 3: Category -->
+                <div class="form-group">
+                    <label for="category" class="form-label">
+                        Category <span class="required">*</span>
+                    </label>
+                    <select id="category" name="category" class="form-select" required>
+                        <option value="" disabled>-- Select Category --</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" {% if instrument['category'] == cat %}selected{% endif %}>
+                            {{ cat }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <span class="form-hint">Musical instrument classification.</span>
+                </div>
+
+                <!-- Field 4: Brand -->
+                <div class="form-group">
+                    <label for="brand" class="form-label">
+                        Brand / Manufacturer <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="brand" 
+                        name="brand" 
+                        class="form-control" 
+                        placeholder="e.g., Fender, Yamaha, Gibson, Roland" 
+                        value="{{ instrument['brand'] }}"
+                        required
+                    >
+                    <span class="form-hint">Brand or maker name.</span>
+                </div>
+
+                <!-- Field 5: Price -->
+                <div class="form-group">
+                    <label for="price" class="form-label">
+                        Price ($) <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="number" 
+                        step="0.01" 
+                        min="0" 
+                        id="price" 
+                        name="price" 
+                        class="form-control" 
+                        placeholder="e.g., 299.99" 
+                        value="{{ instrument['price'] }}"
+                        required
+                    >
+                    <span class="form-hint">Unit price (must be &ge; 0).</span>
+                </div>
+
+                <!-- Field 6: Quantity -->
+                <div class="form-group">
+                    <label for="quantity" class="form-label">
+                        Stock Quantity <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="number" 
+                        min="0" 
+                        id="quantity" 
+                        name="quantity" 
+                        class="form-control" 
+                        placeholder="e.g., 15" 
+                        value="{{ instrument['quantity'] }}"
+                        required
+                    >
+                    <span class="form-hint">Available stock count (must be &ge; 0).</span>
+                </div>
+            </div>
+
+            <!-- Validation Note -->
+            <div class="validation-note">
+                <span class="note-icon">ℹ️</span>
+                <span><strong>Notice:</strong> Changes will be saved directly to SQLite. Price and Quantity cannot be negative values.</span>
+            </div>
+
+            <!-- Form Action Buttons -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-icon">💾</span> Update Instrument
+                </button>
+                <a href="{{ url_for('manage_inventory') }}" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad_38bdf8" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#09090b" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#cbd5e1" />
+      <stop offset="100%" stop-color="#94a3b8" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="400" height="300" rx="16" fill="url(#grad_38bdf8)" />
+
+  <!-- Background decorative rings -->
+  <circle cx="200" cy="140" r="110" fill="none" stroke="#38bdf8" stroke-opacity="0.15" stroke-width="2" />
+  <circle cx="200" cy="140" r="85" fill="none" stroke="#38bdf8" stroke-opacity="0.2" stroke-width="1.5" stroke-dasharray="6,4" />
+
+  <!-- Instrument Artwork -->
+  <g filter="url(#shadow)">
+    
+          <!-- Piano Body Outline -->
+          <rect x="80" y="90" width="240" height="110" rx="8" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5"/>
+          <!-- Music Stand -->
+          <polygon points="150,90 250,90 240,65 160,65" fill="#1e293b" stroke="#cbd5e1" stroke-width="1.5"/>
+          <rect x="175" y="70" width="50" height="15" fill="#f8fafc" rx="1"/>
+          <!-- Keyboard Bed -->
+          <rect x="95" y="140" width="210" height="50" rx="4" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
+          <!-- White Keys -->
+          <rect x="95" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="109" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="123" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="137" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="151" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="165" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="179" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="193" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="207" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="221" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="235" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="249" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="263" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="277" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/><rect x="291" y="140" width="13" height="48" rx="1" fill="#f8fafc" stroke="#94a3b8" stroke-width="0.8"/>
+          <!-- Black Keys -->
+          <rect x="104" y="140" width="8" height="30" rx="1" fill="#0f172a"/><rect x="118" y="140" width="8" height="30" rx="1" fill="#0f172a"/><rect x="146" y="140" width="8" height="30" rx="1" fill="#0f172a"/><rect x="160" y="140" width="8" height="30" rx="1" fill="#0f172a"/><rect x="174" y="140" width="8" height="30" rx="1" fill="#0f172a"/><rect x="202" y="140" width="8" height="30" rx="1" fill="#0f172a"/><rect x="216" y="140" width="8" height="30" rx="1" fill="#0f172a"/><rect x="244" y="140" width="8" height="30" rx="1" fill="#0f172a"/><rect x="258" y="140" width="8" height="30" rx="1" fill="#0f172a"/><rect x="272" y="140" width="8" height="30" rx="1" fill="#0f172a"/>
+          <!-- Pedals -->
+          <rect x="190" y="215" width="6" height="14" fill="#fbbf24"/>
+          <rect x="204" y="215" width="6" height="14" fill="#fbbf24"/>
+        
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="20" y="246" width="360" height="38" rx="8" fill="rgba(15, 23, 42, 0.75)" backdrop-filter="blur(4px)" />
+  <text x="200" y="270" font-family="'Segoe UI', -apple-system, sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">
+    ACOUSTIC & DIGITAL PIANO
+  </text>
+</svg>

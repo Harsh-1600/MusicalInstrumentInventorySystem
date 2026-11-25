@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Orders & Direct Messaging{% endblock %}
+
+{% block content %}
+<div class="content-header">
+    <div class="breadcrumb">
+        <a href="{{ url_for('home') }}">Dashboard</a>
+        <span class="separator">/</span>
+        <span class="current">Customer Orders</span>
+    </div>
+    <div class="header-actions">
+        <span class="live-pill-badge">
+            <span class="pulse-indicator-dot"></span>
+            <span>Real-time Order Feed</span>
+        </span>
+        <a href="{{ url_for('customer_store') }}" target="_blank" class="btn btn-secondary">
+            <span>🛍️ View Storefront</span>
+            <span class="btn-icon-right">↗</span>
+        </a>
+    </div>
+</div>
+
+<div class="page-title-section">
+    <h1 class="page-title">📦 Customer Orders &amp; Direct Messaging</h1>
+    <p class="page-subtitle">Track customer orders in real time, manage order fulfillment status, and send instant WhatsApp/SMS updates directly to customer phone numbers.</p>
+</div>
+
+<!-- ORDER KPI SUMMARY CARDS -->
+<div class="orders-kpi-grid">
+    <div class="order-kpi-card">
+        <div class="kpi-icon-wrap bg-blue-subtle">📦</div>
+        <div class="kpi-info">
+            <span class="kpi-label">Total Customer Orders</span>
+            <span class="kpi-num">{{ kpis.total_orders }}</span>
+        </div>
+    </div>
+    <div class="order-kpi-card">
+        <div class="kpi-icon-wrap bg-green-subtle">💰</div>
+        <div class="kpi-info">
+            <span class="kpi-label">Orders Revenue</span>
+            <span class="kpi-num">₹{{ "%.2f"|format(kpis.total_revenue) }}</span>
+        </div>
+    </div>
+    <div class="order-kpi-card">
+        <div class="kpi-icon-wrap bg-amber-subtle">⏳</div>
+        <div class="kpi-info">
+            <span class="kpi-label">Pending / Confirmed</span>
+            <span class="kpi-num">{{ kpis.pending_orders }}</span>
+        </div>
+    </div>
+    <div class="order-kpi-card">
+        <div class="kpi-icon-wrap bg-purple-subtle">✅</div>
+        <div class="kpi-info">
+            <span class="kpi-label">Delivered Successfully</span>
+            <span class="kpi-num">{{ kpis.delivered_orders }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- FILTERS & SEARCH BAR -->
+<div class="orders-toolbar-card">
+    <form method="GET" action="{{ url_for('admin_orders') }}" class="orders-filter-form">
+        <div class="status-filter-pills">
+            <a href="{{ url_for('admin_orders', status='all', search=search_query) }}" class="filter-pill {% if current_status == 'all' %}active{% endif %}">
+                All Orders ({{ kpis.total_orders }})
+            </a>
+            <a href="{{ url_for('admin_orders', status='confirmed', search=search_query) }}" class="filter-pill status-pill-confirmed {% if current_status == 'confirmed' %}active{% endif %}">
+                Confirmed ({{ kpis.pending_orders }})
+            </a>
+            <a href="{{ url_for('admin_orders', status='processing', search=search_query) }}" class="filter-pill status-pill-processing {% if current_status == 'processing' %}active{% endif %}">
+                Processing
+            </a>
+            <a href="{{ url_for('admin_orders', status='out for delivery', search=search_query) }}" class="filter-pill status-pill-delivery {% if current_status == 'out for delivery' %}active{% endif %}">
+                Out for Delivery
+            </a>
+            <a href="{{ url_for('admin_orders', status='delivered', search=search_query) }}" class="filter-pill status-pill-delivered {% if current_status == 'delivered' %}active{% endif %}">
+                Delivered ({{ kpis.delivered_orders }})
+            </a>
+        </div>
+
+        <div class="orders-search-wrap">
+            <input 
+                type="text" 
+                name="search" 
+                class="form-control orders-search-input" 
+                placeholder="Search by Order #, Customer, Phone, or City..." 
+                value="{{ search_query }}"
+            >
+            {% if current_status and current_status != 'all' %}
+                <input type="hidden" name="status" value="{{ current_status }}">
+            {% endif %}
+            <button type="submit" class="btn btn-primary btn-search-orders">🔍 Search</button>
+            {% if search_query or (current_status and current_status != 'all') %}
+                <a href="{{ url_for('admin_orders') }}" class="btn btn-secondary btn-clear-search">Reset</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- ORDERS TABLE -->
+<div class="table-card">
+    <div class="table-card-header">
+        <div class="table-card-title">
+            <span>Customer Purchase Orders</span>
+            <span class="record-count">({{ orders|length }} records found)</span>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        {% if orders %}
+        <table class="data-table orders-table">
+            <thead>
+                <tr>
+                    <th>Order #</th>
+                    <th>Customer &amp; Phone</th>
+                    <th>Instrument(s) Ordered</th>
+                    <th>Total &amp; Payment</th>
+                    <th>Status</th>
+                    <th>Order Date</th>
+                    <th>Direct Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ord in orders %}
+                <tr class="order-table-row" id="order-row-{{ ord.order_id }}">
+                    <!-- Order ID -->
+                    <td class="font-mono">
+                        <span class="order-code-badge">#{{ ord.order_number }}</span>
+                        <div class="small-text text-muted">ID: {{ ord.order_id }}</div>
+                    </td>
+
+                    <!-- Customer & Phone -->
+                    <td>
+                        <div class="cust-name-cell"><strong>{{ ord.customer_name }}</strong></div>
+                        <div class="cust-phone-badge">
+                            <span>📞</span>
+                            <a href="tel:{{ ord.phone_number }}" class="phone-link">+91 {{ ord.phone_number }}</a>
+                        </div>
+                        <div class="cust-location-text text-muted">
+                            📍 {{ ord.city or 'Tamil Nadu' }}{% if ord.pincode %} - {{ ord.pincode }}{% endif %}
+                        </div>
+                    </td>
+
+                    <!-- Instrument Items -->
+                    <td>
+                        <div class="order-items-cell">
+                            {% for item in ord.order_items %}
+                            <div class="order-item-mini">
+                                <img src="{{ item.image_url or '/static/images/instruments/generic.svg' }}" alt="Instrument" class="order-inst-thumb-mini" onerror="this.src='/static/images/instruments/generic.svg'">
+                                <div class="order-item-text">
+                                    <span class="item-name">{{ item.instrument_name }}</span>
+                                    <span class="item-qty-price">x{{ item.quantity }} @ ₹{{ "%.2f"|format(item.unit_price) }}</span>
+                                </div>
+                            </div>
+                            {% else %}
+                            <span class="text-muted">{{ ord.items_summary or '1 Instrument' }}</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+
+                    <!-- Total Amount & Payment -->
+                    <td>
+                        <div class="order-total-amount">₹{{ "%.2f"|format(ord.total_amount) }}</div>
+                        <span class="payment-method-chip">{{ ord.payment_method }}</span>
+                    </td>
+
+                    <!-- Status with 1-click update -->
+                    <td>
+                        <form method="POST" action="{{ url_for('admin_update_order_status', order_id=ord.order_id) }}" class="status-update-form">
+                            <select name="order_status" class="status-dropdown status-{{ ord.order_status|lower|replace(' ', '-') }}" onchange="this.form.submit()">
+                                <option value="Confirmed" {% if ord.order_status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+                                <option value="Processing" {% if ord.order_status == 'Processing' %}selected{% endif %}>Processing</option>
+                                <option value="Out for Delivery" {% if ord.order_status == 'Out for Delivery' %}selected{% endif %}>Out for Delivery</option>
+                                <option value="Delivered" {% if ord.order_status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                <option value="Cancelled" {% if ord.order_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </form>
+                    </td>
+
+                    <!-- Order Date -->
+                    <td>
+                        <div class="order-date-text">{{ ord.created_at[:10] }}</div>
+                        <div class="order-time-text text-muted">{{ ord.created_at[11:16] }}</div>
+                    </td>
+
+                    <!-- Direct Message & WhatsApp Actions -->
+                    <td>
+                        <div class="order-action-btn-group">
+                            <!-- Direct Message Modal Button -->
+                            <button 
+                                type="button" 
+                                class="btn btn-sm btn-admin-message"
+                                onclick="openMessageModal('{{ ord.order_id }}', '{{ ord.order_number }}', '{{ ord.customer_name }}', '{{ ord.phone_number }}', '{{ ord.items_summary or ord.first_item_name }}')"
+                                title="Send SMS or WhatsApp directly to customer phone"
+                            >
+                                💬 Send Message
+                            </button>
+
+                            <!-- Direct WhatsApp 1-Click Link -->
+                            <a 
+                                href="https://api.whatsapp.com/send?phone=91{{ ord.phone_number }}&text={{ ('🎵 SoundCraft Official: Hello ' + ord.customer_name + ', regarding your order #' + ord.order_number + ' for ' + (ord.items_summary or 'instrument') + '. Your order status is ' + ord.order_status + '!')|urlencode }}" 
+                                target="_blank" 
+                                class="btn btn-sm btn-admin-wa"
+                                title="Open WhatsApp chat with customer"
+                            >
+                                📲 WhatsApp
+                            </a>
+
+                            <!-- View Receipt -->
+                            <a 
+                                href="{{ url_for('customer_order_receipt', order_id=ord.order_id) }}" 
+                                target="_blank" 
+                                class="btn btn-sm btn-outline-secondary"
+                                title="View Customer Invoice"
+                            >
+                                🧾
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="table-empty-state">
+            <div class="empty-icon">📦</div>
+            <h3>No Customer Orders Found</h3>
+            <p>No orders match the selected filter or search term. When customers purchase instruments, their orders appear here automatically.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- DIRECT CUSTOMER MESSAGE MODAL -->
+<div class="admin-msg-modal-backdrop" id="adminMsgModal" style="display: none;">
+    <div class="admin-msg-modal">
+        <div class="modal-head">
+            <div class="modal-title-wrap">
+                <span class="modal-icon">📲</span>
+                <h3>Direct Message to Customer's Phone</h3>
+            </div>
+            <button type="button" class="btn-modal-close" onclick="closeMessageModal()">&times;</button>
+        </div>
+
+        <div class="modal-body">
+            <div class="modal-target-info">
+                <div class="target-field">
+                    <span class="tf-label">Customer Name:</span>
+                    <span class="tf-val" id="modalCustomerName">Customer</span>
+                </div>
+                <div class="target-field">
+                    <span class="tf-label">Phone Number:</span>
+                    <span class="tf-val highlight-phone" id="modalCustomerPhone">+91 XXXXX XXXXX</span>
+                </div>
+                <div class="target-field">
+                    <span class="tf-label">Order Reference:</span>
+                    <span class="tf-val" id="modalOrderRef">#ORD-XXXX</span>
+                </div>
+            </div>
+
+            <!-- Quick Template Chips -->
+            <div class="template-selector-wrap">
+                <label class="field-label">Select Quick Message Template:</label>
+                <div class="template-chips">
+                    <button type="button" class="tmpl-chip" onclick="applyTemplate('confirmed')">✅ Order Confirmed</button>
+                    <button type="button" class="tmpl-chip" onclick="applyTemplate('packed')">📦 Packed &amp; Ready</button>
+                    <button type="button" class="tmpl-chip" onclick="applyTemplate('delivery')">🚚 Out for Delivery</button>
+                    <button type="button" class="tmpl-chip" onclick="applyTemplate('delivered')">🎉 Delivered</button>
+                    <button type="button" class="tmpl-chip" onclick="applyTemplate('custom')">💬 Custom</button>
+                </div>
+            </div>
+
+            <!-- Message Textarea -->
+            <div class="form-group" style="margin-top: 14px;">
+                <label for="customMessageText" class="field-label">Message Content (Dispatched directly to Phone):</label>
+                <textarea id="customMessageText" class="form-control" rows="4" placeholder="Type your message to customer..."></textarea>
+            </div>
+
+            <div class="message-dispatch-status" id="modalStatusMsg" style="display: none;"></div>
+        </div>
+
+        <div class="modal-foot">
+            <button type="button" class="btn btn-secondary" onclick="closeMessageModal()">Cancel</button>
+            <button type="button" class="btn btn-success" id="btnDispatchMessage" onclick="dispatchCustomerMessage()">
+                <span>🚀 Send Directly to Phone via WhatsApp &amp; SMS</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentModalData = { orderId: null, orderNum: '', custName: '', phone: '', items: '' };
+
+    function openMessageModal(orderId, orderNum, custName, phone, items) {
+        currentModalData = { orderId, orderNum, custName, phone, items };
+        document.getElementById('modalCustomerName').textContent = custName || 'Valued Customer';
+        document.getElementById('modalCustomerPhone').textContent = '+91 ' + phone;
+        document.getElementById('modalOrderRef').textContent = '#' + orderNum;
+        
+        applyTemplate('confirmed');
+        
+        const statusBox = document.getElementById('modalStatusMsg');
+        if (statusBox) statusBox.style.display = 'none';
+
+        document.getElementById('adminMsgModal').style.display = 'flex';
+    }
+
+    function closeMessageModal() {
+        document.getElementById('adminMsgModal').style.display = 'none';
+    }
+
+    function applyTemplate(type) {
+        const ta = document.getElementById('customMessageText');
+        if (!ta) return;
+        const name = currentModalData.custName || 'Customer';
+        const num = currentModalData.orderNum || '';
+        const items = currentModalData.items || 'musical instrument';
+
+        if (type === 'confirmed') {
+            ta.value = `Hello ${name}, your SoundCraft order #${num} for ${items} is confirmed! Our store team is carefully inspecting and packing your instrument.`;
+        } else if (type === 'packed') {
+            ta.value = `Hello ${name}, great news! Your order #${num} (${items}) is securely packed and ready for immediate courier dispatch.`;
+        } else if (type === 'delivery') {
+            ta.value = `Hello ${name}, your SoundCraft package for order #${num} is Out for Delivery! Our delivery specialist will reach your location today.`;
+        } else if (type === 'delivered') {
+            ta.value = `Hello ${name}, your order #${num} has been delivered successfully! Thank you for choosing SoundCraft Music. Enjoy making music! 🎶`;
+        } else if (type === 'custom') {
+            ta.value = `Hello ${name}, `;
+            ta.focus();
+        }
+    }
+
+    function dispatchCustomerMessage() {
+        const ta = document.getElementById('customMessageText');
+        const msgText = ta ? ta.value.trim() : '';
+        if (!msgText) {
+            alert('Please type a message before sending.');
+            return;
+        }
+
+        const btn = document.getElementById('btnDispatchMessage');
+        const statusBox = document.getElementById('modalStatusMsg');
+        if (btn) btn.disabled = true;
+
+        const formData = new FormData();
+        formData.append('order_id', currentModalData.orderId || '');
+        formData.append('order_number', currentModalData.orderNum || '');
+        formData.append('customer_name', currentModalData.custName || '');
+        formData.append('phone_number', currentModalData.phone || '');
+        formData.append('message_text', msgText);
+
+        fetch('/api/admin/send-customer-message', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (btn) btn.disabled = false;
+            if (data.success) {
+                if (statusBox) {
+                    statusBox.className = 'message-dispatch-status success';
+                    statusBox.textContent = `✅ ${data.message} Opening direct WhatsApp chat...`;
+                    statusBox.style.display = 'block';
+                }
+                if (data.notification && data.notification.whatsapp_url) {
+                    window.open(data.notification.whatsapp_url, '_blank');
+                }
+                setTimeout(() => {
+                    closeMessageModal();
+                }, 2000);
+            } else {
+                if (statusBox) {
+                    statusBox.className = 'message-dispatch-status danger';
+                    statusBox.textContent = `⚠️ Error: ${data.message}`;
+                    statusBox.style.display = 'block';
+                }
+            }
+        })
+        .catch(err => {
+            if (btn) btn.disabled = false;
+            if (statusBox) {
+                statusBox.className = 'message-dispatch-status danger';
+                statusBox.textContent = '⚠️ Network error while dispatching message.';
+                statusBox.style.display = 'block';
+            }
+        });
+    }
+</script>
+{% endblock %}

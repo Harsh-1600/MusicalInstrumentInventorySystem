@@ -1,0 +1,231 @@
+{% extends "customer/base_customer.html" %}
+
+{% block title %}Order Confirmed #{{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="store-container">
+    <!-- Success Banner -->
+    <div class="order-success-hero">
+        <div class="success-icon-badge">🎉</div>
+        <h1 class="success-title">Order Confirmed!</h1>
+        <p class="success-subtitle">Thank you for your purchase. We are preparing your musical instrument for dispatch.</p>
+        <div class="success-order-id-pill">
+            <span>Order Number:</span>
+            <strong>{{ order.order_number }}</strong>
+        </div>
+    </div>
+
+    <!-- Actions Bar (Screen Only) -->
+    <div class="receipt-actions-bar no-print">
+        <div class="receipt-actions-left">
+            <button onclick="window.print()" class="btn btn-outline-primary">
+                <span>🖨️ Print / Save Invoice</span>
+            </button>
+            <a href="{{ url_for('customer_orders') }}" class="btn btn-outline-secondary">
+                <span>📦 View All My Orders</span>
+            </a>
+        </div>
+        <div class="receipt-actions-right">
+            <a href="{{ url_for('customer_store') }}" class="btn btn-primary">
+                <span>🛍️ Continue Shopping</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Order Notification Target Card (Screen Only) -->
+    <div class="sms-notification-card no-print" id="smsNotificationCard">
+        <div class="sms-card-header">
+            <div class="sms-card-title-group">
+                <span class="sms-phone-icon">📱</span>
+                <div>
+                    <h3 class="sms-card-title">Order Queued for Store Administrator Dispatch</h3>
+                    <p class="sms-card-subtitle">
+                        Registered Notification Phone: <strong>{{ notification.formatted_phone if notification else ('+91 ' ~ order.phone_number) }}</strong>
+                    </p>
+                </div>
+            </div>
+            <div class="sms-status-pill">
+                <span class="status-pulse-dot"></span>
+                <span>Order Verified</span>
+            </div>
+        </div>
+
+        <div class="sms-auto-dispatch-banner" style="background: #f0fdf4; border-color: #86efac;">
+            <div class="auto-dispatch-left">
+                <span class="auto-spinner-icon">✅</span>
+                <span class="auto-dispatch-text" style="color: #166534;">
+                    <strong>Order Status:</strong> Your order #{{ order.order_number }} is confirmed. The Store Administrator will send real-time SMS &amp; WhatsApp updates directly to your registered mobile number: <strong>{{ notification.formatted_phone if notification else ('+91 ' ~ order.phone_number) }}</strong>.
+                </span>
+            </div>
+        </div>
+
+        <!-- Only Administrator can send messages -->
+        {% if session.get('role') == 'Admin' %}
+        <div class="sms-actions-row" style="margin-top: 14px;">
+            <a href="{{ url_for('admin_orders') }}" class="btn btn-primary" title="Open Admin Orders Hub">
+                <span>🛡️ Open Admin Orders &amp; Message Customer Directly &rarr;</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Printable Invoice Sheet -->
+    <div class="invoice-sheet" id="printableInvoice">
+        <!-- Invoice Header -->
+        <div class="invoice-header">
+            <div class="invoice-brand">
+                <div class="invoice-logo">🎵</div>
+                <div>
+                    <h2 class="invoice-company-name">SoundCraft Musical Instruments</h2>
+                    <p class="invoice-tagline">Official Purchase Receipt &amp; Warranty Card</p>
+                </div>
+            </div>
+            <div class="invoice-meta-block">
+                <div class="invoice-num">#{{ order.order_number }}</div>
+                <div class="invoice-date">Date: {{ order.created_at }}</div>
+                <span class="invoice-status-pill status-{{ order.order_status|lower }}">
+                    Status: {{ order.order_status }}
+                </span>
+            </div>
+        </div>
+
+        <div class="invoice-divider"></div>
+
+        <!-- Customer & Delivery Information Grid -->
+        <div class="invoice-details-grid">
+            <div class="invoice-block">
+                <h4 class="invoice-block-title">Customer &amp; Billing</h4>
+                <div class="invoice-block-content">
+                    <p><strong>{{ order.customer_name }}</strong></p>
+                    <p>📧 {{ order.customer_email }}</p>
+                    <p>📞 {{ order.phone_number }}</p>
+                </div>
+            </div>
+
+            <div class="invoice-block">
+                <h4 class="invoice-block-title">Shipping Address</h4>
+                <div class="invoice-block-content">
+                    <p>{{ order.shipping_address }}</p>
+                    <p>{{ order.city }}{% if order.pincode %} - {{ order.pincode }}{% endif %}</p>
+                    <p><em>Country: India</em></p>
+                </div>
+            </div>
+
+            <div class="invoice-block">
+                <h4 class="invoice-block-title">Payment &amp; Logistics</h4>
+                <div class="invoice-block-content">
+                    <p><strong>Method:</strong> {{ order.payment_method }}</p>
+                    <p><strong>Delivery:</strong> Express Shockproof Courier</p>
+                    <p><strong>Est. Dispatch:</strong> Within 24-48 Hours</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ordered Items Table -->
+        <div class="invoice-items-table-wrap">
+            <table class="invoice-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">#</th>
+                        <th>Item Description</th>
+                        <th class="text-center" style="width: 100px;">Qty</th>
+                        <th class="text-right" style="width: 140px;">Unit Price</th>
+                        <th class="text-right" style="width: 140px;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.order_items %}
+                    <tr>
+                        <td class="text-muted">{{ loop.index }}</td>
+                        <td>
+                            <div class="invoice-item-desc">
+                                {% if item.image_url %}
+                                <img 
+                                    src="{% if item.image_url.startswith('/') or item.image_url.startswith('http') %}{{ item.image_url }}{% elif item.image_url.startswith('static/') %}/{{ item.image_url }}{% else %}{{ url_for('static', filename=item.image_url) }}{% endif %}" 
+                                    alt="{{ item.instrument_name }}"
+                                    class="invoice-item-thumb no-print"
+                                >
+                                {% endif %}
+                                <div>
+                                    <div class="invoice-item-title">{{ item.instrument_name }}</div>
+                                    <small class="invoice-item-code">ID: #{{ item.instrument_id }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center font-bold">{{ item.quantity }}</td>
+                        <td class="text-right">₹{{ "{:,.2f}".format(item.unit_price) }}</td>
+                        <td class="text-right font-bold">₹{{ "{:,.2f}".format(item.subtotal) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Totals Summary -->
+        <div class="invoice-totals-section">
+            <div class="invoice-notes">
+                <p><strong>Warranty Policy:</strong> 1-Year Comprehensive Manufacturer Warranty against acoustic tonewood cracks and hardware defects.</p>
+                <p><strong>Care Advice:</strong> Keep instrument away from extreme humidity and direct sunlight.</p>
+            </div>
+
+            <div class="invoice-summary-box">
+                <div class="inv-sum-row">
+                    <span>Items Subtotal:</span>
+                    <span>₹{{ "{:,.2f}".format(order.total_amount) }}</span>
+                </div>
+                <div class="inv-sum-row">
+                    <span>Express Shipping:</span>
+                    <span class="text-success">FREE</span>
+                </div>
+                <div class="inv-sum-row inv-grand-total">
+                    <span>Total Paid / Payable:</span>
+                    <span>₹{{ "{:,.2f}".format(order.total_amount) }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invoice Footer -->
+        <div class="invoice-footer">
+            <p>&copy; 2026 SoundCraft Musical Instruments Store &bull; Official Digital Tax Invoice</p>
+            <p class="invoice-legal">This is a computer-generated receipt and requires no physical signature.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+function playSmsChime() {
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
+        const ctx = new AudioContext();
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc1.type = 'sine';
+        osc2.type = 'sine';
+        osc1.frequency.setValueAtTime(587.33, ctx.currentTime);
+        osc2.frequency.setValueAtTime(880.00, ctx.currentTime + 0.08);
+
+        gain.gain.setValueAtTime(0.12, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc1.start();
+        osc1.stop(ctx.currentTime + 0.08);
+        osc2.start(ctx.currentTime + 0.08);
+        osc2.stop(ctx.currentTime + 0.35);
+    } catch (e) {
+        // Safe ignore if browser blocks audio prior to interaction
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Play gentle order confirmation chime
+    playSmsChime();
+});
+</script>
+{% endblock %}

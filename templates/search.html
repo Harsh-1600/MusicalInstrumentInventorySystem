@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Search Instruments{% endblock %}
+{% block page_title %}Search Instruments{% endblock %}
+
+{% block content %}
+<div class="search-page-container">
+    <!-- Task 1 & 2: Search Controls Card -->
+    <div class="panel search-controls-card">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <span class="panel-icon">🔍</span>
+                <h3>Search Inventory</h3>
+            </div>
+            <span class="panel-subtext">Find instruments by Name, Category, Brand, or ID</span>
+        </div>
+
+        <div class="panel-body search-body">
+            <form action="{{ url_for('search_instruments_route') }}" method="GET" class="advanced-search-form">
+                <div class="search-form-grid">
+                    <!-- Search Input -->
+                    <div class="search-field-group">
+                        <label for="q" class="search-label">Keyword or ID</label>
+                        <div class="search-input-wrapper">
+                            <span class="search-icon">🔎</span>
+                            <input 
+                                type="text" 
+                                id="q" 
+                                name="q" 
+                                class="search-input-field" 
+                                placeholder="e.g. Guitar, Yamaha, Strings, or 101..." 
+                                value="{{ query }}"
+                                autofocus
+                            >
+                            {% if query %}
+                            <a href="{{ url_for('search_instruments_route') }}" class="search-clear-btn" title="Clear query">&times;</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Search Criteria Dropdown -->
+                    <div class="search-field-group criteria-group">
+                        <label for="criteria" class="search-label">Search In</label>
+                        <select id="criteria" name="criteria" class="form-select search-select">
+                            <option value="all" {% if criteria == 'all' %}selected{% endif %}>All Fields (Name, Category, Brand, ID)</option>
+                            <option value="name" {% if criteria == 'name' %}selected{% endif %}>Instrument Name</option>
+                            <option value="category" {% if criteria == 'category' %}selected{% endif %}>Category</option>
+                            <option value="brand" {% if criteria == 'brand' %}selected{% endif %}>Brand / Manufacturer</option>
+                            <option value="id" {% if criteria == 'id' %}selected{% endif %}>Instrument ID</option>
+                        </select>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="search-btn-group">
+                        <button type="submit" class="btn btn-primary btn-search-submit">
+                            <span class="btn-icon">🔍</span> Search
+                        </button>
+                        <a href="{{ url_for('search_instruments_route') }}" class="btn btn-secondary">
+                            Clear
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Results Status Bar -->
+    <div class="search-status-bar">
+        <div class="status-left">
+            {% if is_search_performed %}
+            <span class="status-badge-search">Search Active</span>
+            <span class="status-text">
+                Found <strong>{{ total_results }}</strong> result(s) for "<strong>{{ query }}</strong>" 
+                {% if criteria != 'all' %}(filtered by <em>{{ criteria|capitalize }}</em>){% endif %}
+            </span>
+            {% else %}
+            <span class="status-badge-all">All Instruments</span>
+            <span class="status-text">Displaying all <strong>{{ total_results }}</strong> instruments in database</span>
+            {% endif %}
+        </div>
+        {% if is_search_performed %}
+        <div class="status-right">
+            <a href="{{ url_for('search_instruments_route') }}" class="link-reset-search">Show All Instruments &rarr;</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Task 4: Search Results Table -->
+    <div class="panel results-panel">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <span class="panel-icon">📋</span>
+                <h3>Search Results</h3>
+            </div>
+            <span class="panel-subtext">{{ total_results }} Records Found</span>
+        </div>
+
+        <div class="panel-body table-panel-body">
+            {% if results and results|length > 0 %}
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Instrument ID</th>
+                            <th>Instrument Name</th>
+                            <th>Category</th>
+                            <th>Brand</th>
+                            <th>Price</th>
+                            <th>Available Quantity</th>
+                            <th>Stock Status</th>
+                            <th class="text-center">Quick Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for inst in results %}
+                        <tr>
+                            <td class="col-id">{% if inst['instrument_id']|string|first in '0123456789' %}#{{ inst['instrument_id'] }}{% else %}{{ inst['instrument_id'] }}{% endif %}</td>
+                            <td class="col-name"><strong>{{ inst['name'] }}</strong></td>
+                            <td><span class="tag-category">{{ inst['category'] }}</span></td>
+                            <td class="col-brand">{{ inst['brand'] }}</td>
+                            <td class="col-price">${{ "%.2f"|format(inst['price']) }}</td>
+                            <td class="col-qty">{{ inst['quantity'] }} units</td>
+                            <td>
+                                {% if inst['quantity'] == 0 %}
+                                <span class="badge-status badge-out">Out of Stock</span>
+                                {% elif inst['quantity'] <= 5 %}
+                                <span class="badge-status badge-low">Low Stock</span>
+                                {% else %}
+                                <span class="badge-status badge-in">Available</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <a href="{{ url_for('edit_instrument', instrument_id=inst['instrument_id']) }}" class="btn-action btn-edit" title="Edit this instrument">
+                                    ✏️ Edit
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <!-- Task 3: No Results Message -->
+            <div class="empty-state">
+                <div class="empty-icon">🔎</div>
+                {% if is_search_performed %}
+                <h4>No Matching Instruments Found</h4>
+                <p>We couldn't find any instruments matching "<strong>{{ query }}</strong>" under the selected criteria.</p>
+                <div class="empty-actions">
+                    <a href="{{ url_for('search_instruments_route') }}" class="btn btn-secondary">Clear Search Filter</a>
+                    <a href="{{ url_for('add_instrument') }}" class="btn btn-primary">➕ Add New Instrument</a>
+                </div>
+                {% else %}
+                <h4>Inventory is Empty</h4>
+                <p>There are no instruments in the database yet. Add an instrument to begin tracking your inventory.</p>
+                <div class="empty-actions">
+                    <a href="{{ url_for('add_instrument') }}" class="btn btn-primary">➕ Add First Instrument</a>
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

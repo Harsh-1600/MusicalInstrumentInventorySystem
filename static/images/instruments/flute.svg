@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad_34d399" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#cbd5e1" />
+      <stop offset="100%" stop-color="#94a3b8" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="400" height="300" rx="16" fill="url(#grad_34d399)" />
+
+  <!-- Background decorative rings -->
+  <circle cx="200" cy="140" r="110" fill="none" stroke="#34d399" stroke-opacity="0.15" stroke-width="2" />
+  <circle cx="200" cy="140" r="85" fill="none" stroke="#34d399" stroke-opacity="0.2" stroke-width="1.5" stroke-dasharray="6,4" />
+
+  <!-- Instrument Artwork -->
+  <g filter="url(#shadow)">
+    
+          <!-- Diagonal Flute Body -->
+          <line x1="80" y1="210" x2="320" y2="60" stroke="#f1f5f9" stroke-width="12" stroke-linecap="round"/>
+          <line x1="80" y1="210" x2="320" y2="60" stroke="#94a3b8" stroke-width="4" stroke-linecap="round"/>
+          <!-- Embouchure Mouth Hole -->
+          <ellipse cx="120" cy="185" rx="4" ry="2.5" fill="#0f172a" transform="rotate(-32 120 185)"/>
+          <!-- Tone Holes -->
+          <circle cx="150" cy="165" r="3" fill="#0f172a" stroke="#cbd5e1" stroke-width="1"/><circle cx="172" cy="151" r="3" fill="#0f172a" stroke="#cbd5e1" stroke-width="1"/><circle cx="194" cy="137" r="3" fill="#0f172a" stroke="#cbd5e1" stroke-width="1"/><circle cx="216" cy="123" r="3" fill="#0f172a" stroke="#cbd5e1" stroke-width="1"/><circle cx="238" cy="109" r="3" fill="#0f172a" stroke="#cbd5e1" stroke-width="1"/><circle cx="260" cy="95" r="3" fill="#0f172a" stroke="#cbd5e1" stroke-width="1"/><circle cx="282" cy="81" r="3" fill="#0f172a" stroke="#cbd5e1" stroke-width="1"/>
+          <!-- Keys & Rings -->
+          <line x1="105" y1="200" x2="100" y2="192" stroke="#cbd5e1" stroke-width="2"/>
+          <line x1="305" y1="74" x2="300" y2="66" stroke="#cbd5e1" stroke-width="2"/>
+        
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="20" y="246" width="360" height="38" rx="8" fill="rgba(15, 23, 42, 0.75)" backdrop-filter="blur(4px)" />
+  <text x="200" y="270" font-family="'Segoe UI', -apple-system, sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">
+    CONCERT & BAMBOO FLUTE
+  </text>
+</svg>

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad_facc15" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#713f12" />
+      <stop offset="100%" stop-color="#a16207" />
+    </linearGradient>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#cbd5e1" />
+      <stop offset="100%" stop-color="#94a3b8" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="400" height="300" rx="16" fill="url(#grad_facc15)" />
+
+  <!-- Background decorative rings -->
+  <circle cx="200" cy="140" r="110" fill="none" stroke="#facc15" stroke-opacity="0.15" stroke-width="2" />
+  <circle cx="200" cy="140" r="85" fill="none" stroke="#facc15" stroke-opacity="0.2" stroke-width="1.5" stroke-dasharray="6,4" />
+
+  <!-- Instrument Artwork -->
+  <g filter="url(#shadow)">
+    
+          <!-- Saxophone Curved Body -->
+          <path d="M 180 50 L 195 50 L 195 160 C 195 200, 240 200, 245 150 L 255 120 L 275 115 L 260 170 C 250 220, 175 220, 175 160 Z" fill="#eab308" stroke="#fef08a" stroke-width="2.5"/>
+          <!-- Bell Opening Flare -->
+          <ellipse cx="265" cy="118" rx="16" ry="8" fill="#ca8a04" stroke="#fef08a" stroke-width="2" transform="rotate(-20 265 118)"/>
+          <!-- Neck & Mouthpiece -->
+          <path d="M 180 50 Q 170 50, 165 42 L 155 45" stroke="#ca8a04" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <rect x="150" y="42" width="7" height="6" fill="#0f172a"/>
+          <!-- Key Pearls -->
+          <circle cx="187" cy="85" r="3" fill="#ffffff" stroke="#a16207" stroke-width="1"/>
+          <circle cx="187" cy="105" r="3" fill="#ffffff" stroke="#a16207" stroke-width="1"/>
+          <circle cx="187" cy="125" r="3" fill="#ffffff" stroke="#a16207" stroke-width="1"/>
+          <circle cx="187" cy="145" r="3" fill="#ffffff" stroke="#a16207" stroke-width="1"/>
+        
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="20" y="246" width="360" height="38" rx="8" fill="rgba(15, 23, 42, 0.75)" backdrop-filter="blur(4px)" />
+  <text x="200" y="270" font-family="'Segoe UI', -apple-system, sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">
+    SAXOPHONE & BRASS
+  </text>
+</svg>

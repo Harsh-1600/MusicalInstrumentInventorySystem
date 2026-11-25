@@ -1,0 +1,401 @@
+{% extends "customer/base_customer.html" %}
+
+{% block title %}{{ instrument.name }} - Details &amp; Uses{% endblock %}
+
+{% block content %}
+<div class="store-container">
+    <!-- Breadcrumb Navigation -->
+    <nav class="store-breadcrumb" aria-label="breadcrumb">
+        <a href="{{ url_for('customer_store') }}">Store Catalog</a>
+        <span class="breadcrumb-sep">&gt;</span>
+        <a href="{{ url_for('customer_store', category=instrument.category) }}">{{ instrument.category }}</a>
+        <span class="breadcrumb-sep">&gt;</span>
+        <span class="breadcrumb-current">{{ instrument.name }}</span>
+    </nav>
+
+    <!-- Main Instrument Detail Grid -->
+    <div class="instrument-detail-layout">
+        <!-- Left Column: Visual Showcase & Stock Purchase Action -->
+        <div class="detail-visual-column">
+            <!-- Large Image Showcase -->
+            <div class="detail-image-card">
+                <img 
+                    src="{% if instrument.image_url.startswith('/') or instrument.image_url.startswith('http') %}{{ instrument.image_url }}{% elif instrument.image_url.startswith('static/') %}/{{ instrument.image_url }}{% else %}{{ url_for('static', filename=instrument.image_url) }}{% endif %}" 
+                    alt="{{ instrument.name }}"
+                    class="detail-large-img"
+                >
+                <div class="detail-image-badges">
+                    <span class="badge-brand">{{ instrument.brand }}</span>
+                    <span class="badge-cat">{{ instrument.category }}</span>
+                    <span class="badge-id">ID: {{ instrument.instrument_id }}</span>
+                </div>
+            </div>
+
+            <!-- Price & Stock Status Card -->
+            <div class="detail-purchase-card">
+                <div class="purchase-price-row">
+                    <div class="purchase-price-block">
+                        <span class="price-label">Price</span>
+                        <div class="purchase-price">
+                            <span class="currency">₹</span>{{ "{:,.2f}".format(instrument.price) }}
+                        </div>
+                    </div>
+
+                    <!-- Live Stock Status Badge -->
+                    <div class="stock-badge-large {{ instrument.stock_badge_class }}">
+                        <span class="stock-dot-large"></span>
+                        <div class="stock-label-group">
+                            <span class="stock-status-title">{{ instrument.stock_label }}</span>
+                            <span class="stock-status-sub">
+                                {% if instrument.stock_status == 'in_stock' %}
+                                    Ready for immediate delivery or store pickup
+                                {% elif instrument.stock_status == 'low_stock' %}
+                                    Limited quantity remaining in warehouse
+                                {% else %}
+                                    Currently out of stock. Inquire for re-stock notification
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order & Purchase Action Section -->
+                {% if instrument.quantity > 0 %}
+                <div class="detail-purchase-box">
+                    <form action="{{ url_for('customer_checkout_single', instrument_id=instrument.instrument_id) }}" method="GET" class="detail-order-form" id="directOrderForm">
+                        <div class="order-qty-picker">
+                            <label for="orderQtyInput" class="order-qty-label">Quantity:</label>
+                            <div class="qty-stepper-wrap">
+                                <button type="button" class="btn-stepper" onclick="updateDetailQty(-1)" title="Decrease">&minus;</button>
+                                <input 
+                                    type="number" 
+                                    id="orderQtyInput" 
+                                    name="quantity" 
+                                    value="1" 
+                                    min="1" 
+                                    max="{{ instrument.quantity }}" 
+                                    class="stepper-input"
+                                    onchange="validateDetailQty()"
+                                >
+                                <button type="button" class="btn-stepper" onclick="updateDetailQty(1)" title="Increase">+</button>
+                            </div>
+                            <span class="qty-stock-hint">({{ instrument.quantity }} in stock)</span>
+                        </div>
+
+                        <div class="order-button-stack">
+                            <button type="submit" class="btn btn-order-primary">
+                                <span>⚡ Order Now (Buy Immediately)</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Add to Cart Form -->
+                    <form action="{{ url_for('customer_cart_add', instrument_id=instrument.instrument_id) }}" method="POST" class="detail-cart-form" id="addToCartForm">
+                        <input type="hidden" name="quantity" id="cartQtyInput" value="1">
+                        <button type="submit" class="btn btn-cart-secondary">
+                            <span>🛒 Add to Cart</span>
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="detail-out-of-stock-box">
+                    <button class="btn btn-disabled btn-block" disabled>
+                        <span>❌ Out of Stock - Currently Unavailable</span>
+                    </button>
+                    <form action="{{ url_for('customer_inquire', instrument_id=instrument.instrument_id) }}" method="POST" class="detail-inquiry-form" style="margin-top: 10px;">
+                        <button type="submit" class="btn btn-inquire-now">
+                            <span>💬 Inquire for Next Restock Batch</span>
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+
+                <div class="detail-aux-actions">
+                    <a href="{{ url_for('customer_store') }}" class="btn btn-back-catalog">
+                        <span>← Back to Catalog</span>
+                    </a>
+                </div>
+            </div>
+
+            <script>
+                function updateDetailQty(delta) {
+                    const input = document.getElementById('orderQtyInput');
+                    const cartInput = document.getElementById('cartQtyInput');
+                    const max = parseInt(input.getAttribute('max')) || 1;
+                    let val = parseInt(input.value) || 1;
+                    val = Math.max(1, Math.min(val + delta, max));
+                    input.value = val;
+                    if (cartInput) cartInput.value = val;
+                }
+                function validateDetailQty() {
+                    const input = document.getElementById('orderQtyInput');
+                    const cartInput = document.getElementById('cartQtyInput');
+                    const max = parseInt(input.getAttribute('max')) || 1;
+                    let val = parseInt(input.value) || 1;
+                    if (val < 1) val = 1;
+                    if (val > max) val = max;
+                    input.value = val;
+                    if (cartInput) cartInput.value = val;
+                }
+            </script>
+
+            <!-- Interactive Instrument Sound Demo & Audio Player Card -->
+            <div class="detail-sound-demo-card">
+                <div class="sound-demo-header">
+                    <div class="sound-demo-title-group">
+                        <span class="sound-wave-icon">🎵</span>
+                        <div>
+                            <h4 class="sound-demo-title">Instrument Sound Demo / நேரடி இசை மாதிரி</h4>
+                            <p class="sound-demo-subtitle" style="margin-bottom:4px;">Listen to {{ instrument.name }} in action</p>
+                            <div class="track-info-badge" style="display:inline-flex; align-items:center; gap:6px; padding:3px 10px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:9999px; font-size:0.8rem; color:#1e40af; font-weight:600;">
+                                <span>🎧 Iconic Track:</span> <span id="iconicTrackTitle">Featured Solo</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="sound-badge-live">Live Audio</span>
+                </div>
+
+                <!-- Main Melody Demo Player & Waveform Visualizer -->
+                <div class="sound-player-widget">
+                    <button type="button" class="btn-play-demo" id="btnPlayDemo" onclick="SoundCraftSynth.playDemo('{{ instrument.category }}', '{{ instrument.name }}', '{{ instrument.instrument_id }}')">
+                        <span class="play-icon" id="playIcon">▶️</span>
+                        <span class="play-text" id="playText">Play Melody Demo</span>
+                    </button>
+                    
+                    <div class="sound-visualizer" id="soundVisualizer">
+                        <span class="viz-bar"></span>
+                        <span class="viz-bar"></span>
+                        <span class="viz-bar"></span>
+                        <span class="viz-bar"></span>
+                        <span class="viz-bar"></span>
+                        <span class="viz-bar"></span>
+                        <span class="viz-bar"></span>
+                        <span class="viz-bar"></span>
+                    </div>
+                </div>
+
+                <div class="sound-status-bar">
+                    <span id="soundStatusMsg" class="sound-status-msg">Click "Play Melody Demo" or try note keys below</span>
+                </div>
+
+                <!-- Interactive Virtual Playable Keys -->
+                <div class="interactive-keys-section">
+                    <p class="interactive-keys-hint">🎹 Try playing notes yourself (Click any note):</p>
+                    <div class="note-keys-row">
+                        <button type="button" class="btn-note-key" data-note="C4" onclick="SoundCraftSynth.playSingleNote('Sa / C4', 261.63, '{{ instrument.category }}', '{{ instrument.name }}')">
+                            <span class="swara-label">Sa</span>
+                            <span class="note-pitch">C4</span>
+                        </button>
+                        <button type="button" class="btn-note-key" data-note="D4" onclick="SoundCraftSynth.playSingleNote('Ri / D4', 293.66, '{{ instrument.category }}', '{{ instrument.name }}')">
+                            <span class="swara-label">Ri</span>
+                            <span class="note-pitch">D4</span>
+                        </button>
+                        <button type="button" class="btn-note-key" data-note="E4" onclick="SoundCraftSynth.playSingleNote('Ga / E4', 329.63, '{{ instrument.category }}', '{{ instrument.name }}')">
+                            <span class="swara-label">Ga</span>
+                            <span class="note-pitch">E4</span>
+                        </button>
+                        <button type="button" class="btn-note-key" data-note="F4" onclick="SoundCraftSynth.playSingleNote('Ma / F4', 349.23, '{{ instrument.category }}', '{{ instrument.name }}')">
+                            <span class="swara-label">Ma</span>
+                            <span class="note-pitch">F4</span>
+                        </button>
+                        <button type="button" class="btn-note-key" data-note="G4" onclick="SoundCraftSynth.playSingleNote('Pa / G4', 392.00, '{{ instrument.category }}', '{{ instrument.name }}')">
+                            <span class="swara-label">Pa</span>
+                            <span class="note-pitch">G4</span>
+                        </button>
+                        <button type="button" class="btn-note-key" data-note="A4" onclick="SoundCraftSynth.playSingleNote('Dha / A4', 440.00, '{{ instrument.category }}', '{{ instrument.name }}')">
+                            <span class="swara-label">Dha</span>
+                            <span class="note-pitch">A4</span>
+                        </button>
+                        <button type="button" class="btn-note-key" data-note="B4" onclick="SoundCraftSynth.playSingleNote('Ni / B4', 493.88, '{{ instrument.category }}', '{{ instrument.name }}')">
+                            <span class="swara-label">Ni</span>
+                            <span class="note-pitch">B4</span>
+                        </button>
+                        <button type="button" class="btn-note-key" data-note="C5" onclick="SoundCraftSynth.playSingleNote('Sȧ / C5', 523.25, '{{ instrument.category }}', '{{ instrument.name }}')">
+                            <span class="swara-label">Sȧ</span>
+                            <span class="note-pitch">C5</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Specifications Card -->
+            <div class="detail-specs-card">
+                <h4 class="specs-card-title">⚙️ Instrument Specifications</h4>
+                <div class="specs-table">
+                    <div class="specs-row">
+                        <span class="spec-name">Instrument Name</span>
+                        <span class="spec-val">{{ instrument.name }}</span>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-name">Category</span>
+                        <span class="spec-val">{{ instrument.category }}</span>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-name">Brand / Maker</span>
+                        <span class="spec-val">{{ instrument.brand }}</span>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-name">Catalog Code</span>
+                        <span class="spec-val">#{{ instrument.instrument_id }}</span>
+                    </div>
+                    <div class="specs-row">
+                        <span class="spec-name">Build Specs</span>
+                        <span class="spec-val">{{ instrument.specifications or 'Professional standard build with premium acoustic tonewoods and durable hardware fittings.' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Deep-Dive "What is this instrument used for?" ("Ethuku Use Pannalam") -->
+        <div class="detail-content-column">
+            <!-- Header Title -->
+            <div class="detail-title-section">
+                <div class="title-meta-line">
+                    <span class="meta-brand">{{ instrument.brand }}</span>
+                    <span class="meta-dot">&bull;</span>
+                    <span class="meta-cat">{{ instrument.category }}</span>
+                </div>
+                <h1 class="detail-instrument-name">{{ instrument.name }}</h1>
+                <p class="detail-description">{{ instrument.description }}</p>
+            </div>
+
+            <!-- CORE SECTION: "WHAT IS THIS INSTRUMENT USED FOR?" ("ETHUKU USE PANNALAM") -->
+            <div class="usage-guide-hero-card">
+                <div class="usage-hero-header">
+                    <div class="usage-hero-icon">💡</div>
+                    <div>
+                        <h2 class="usage-hero-title">What is this instrument used for? / இசைப் பயன்பாடுகள்</h2>
+                        <span class="usage-hero-subtitle">Comprehensive usage guide &bull; Musical roles, genres, and context</span>
+                    </div>
+                </div>
+
+                <div class="usage-hero-body">
+                    <!-- Main Usage Statement -->
+                    <div class="usage-core-statement">
+                        <p class="core-statement-text">{{ instrument.use_case }}</p>
+                    </div>
+
+                    <!-- 4 Structured Pillar Cards -->
+                    <div class="usage-pillars-grid">
+                        <!-- Pillar 1: Musical Genres -->
+                        <div class="usage-pillar-card">
+                            <div class="pillar-icon">🎵</div>
+                            <h4 class="pillar-title">Musical Genres &amp; Styles</h4>
+                            <p class="pillar-desc">
+                                {% if instrument.category == 'String Instruments' %}
+                                    Acoustic Pop, Rock, Classical, South Indian Carnatic, Western Folk, Jazz, and Fingerstyle.
+                                {% elif instrument.category == 'Wind Instruments' %}
+                                    Classical Orchestras, Jazz Big Bands, Blues, Marching Bands, and Indian Classical Fusion.
+                                {% elif instrument.category == 'Percussion Instruments' %}
+                                    Rock &amp; Pop beats, Latin Salsa, Hindustani &amp; Carnatic classical rhythms, World music.
+                                {% elif instrument.category == 'Keyboard Instruments' %}
+                                    Classical concertos, Jazz trios, Gospel churches, Pop accompaniment, and film scoring.
+                                {% elif instrument.category == 'Electronic Instruments' %}
+                                    Modern EDM, Hip-Hop beatmaking, Synthwave, Studio tracking, and silent stage monitoring.
+                                {% else %}
+                                    Versatile across contemporary acoustic ensembles, traditional world music, and modern studio scoring.
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <!-- Pillar 2: Performance & Band Role -->
+                        <div class="usage-pillar-card">
+                            <div class="pillar-icon">🎭</div>
+                            <h4 class="pillar-title">Performance Context &amp; Role</h4>
+                            <p class="pillar-desc">
+                                {% if 'Guitar' in instrument.name or 'Les Paul' in instrument.name %}
+                                    Primary harmonic rhythm strumming, melody lead solos, arpeggiated fingerpicking, and vocal backing.
+                                {% elif 'Piano' in instrument.name or 'Keyboard' in instrument.name %}
+                                    Full polyphonic harmony, bass accompaniment, dynamic chords, and intricate melody leads.
+                                {% elif 'Drum' in instrument.name or 'Tabla' in instrument.name or 'Mridangam' in instrument.name %}
+                                    The rhythmic anchor that maintains tempo, drives syncopation, and punctuates song transitions.
+                                {% elif 'Violin' in instrument.name or 'Flute' in instrument.name or 'Saxophone' in instrument.name %}
+                                    Emotional singing lead melodies, delicate ornamentation, orchestral blends, and piercing solos.
+                                {% else %}
+                                    Provides essential texture, melodic counterpoint, or rhythmic punctuation to the musical arrangement.
+                                {% endif %}
+                            </p>
+                        </div>
+
+                        <!-- Pillar 3: Ideal Musician & Skill Level -->
+                        <div class="usage-pillar-card">
+                            <div class="pillar-icon">🎯</div>
+                            <h4 class="pillar-title">Ideal User &amp; Skill Level</h4>
+                            <p class="pillar-desc">
+                                Suitable for music school students, passionate hobbyists, recording artists, and stage performers seeking authentic acoustic response and reliable durability.
+                            </p>
+                        </div>
+
+                        <!-- Pillar 4: Acoustic Character -->
+                        <div class="usage-pillar-card">
+                            <div class="pillar-icon">🔊</div>
+                            <h4 class="pillar-title">Acoustic Tone &amp; Character</h4>
+                            <p class="pillar-desc">
+                                Delivers rich acoustic projection, well-balanced dynamic frequency response, and natural acoustic warmth that resonates in any room or concert hall.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Care & Maintenance Tips -->
+                    <div class="usage-care-box">
+                        <div class="care-icon">🛡️</div>
+                        <div class="care-content">
+                            <h5 class="care-title">Maintenance &amp; Longevity Recommendations</h5>
+                            <p class="care-text">
+                                Store in a climate-controlled room away from direct sunlight or dampness. Wipe with a dry microfiber cloth after playing. Keep in a protective padded case or stand when not in use.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Related Instruments Section -->
+    {% if related_instruments %}
+    <div class="related-instruments-section">
+        <div class="related-header">
+            <h3 class="related-title">More Instruments in {{ instrument.category }}</h3>
+            <a href="{{ url_for('customer_store', category=instrument.category) }}" class="related-view-all">
+                <span>View All {{ instrument.category }} &rarr;</span>
+            </a>
+        </div>
+
+        <div class="related-grid">
+            {% for rel in related_instruments %}
+            <div class="related-card">
+                <a href="{{ url_for('customer_instrument_detail', instrument_id=rel.instrument_id) }}" class="related-card-img-wrap">
+                    <img 
+                        src="{% if rel.image_url.startswith('/') or rel.image_url.startswith('http') %}{{ rel.image_url }}{% elif rel.image_url.startswith('static/') %}/{{ rel.image_url }}{% else %}{{ url_for('static', filename=rel.image_url) }}{% endif %}" 
+                        alt="{{ rel.name }}" 
+                        class="related-img"
+                    >
+                </a>
+                <div class="related-card-info">
+                    <span class="related-brand">{{ rel.brand }}</span>
+                    <h4 class="related-name">
+                        <a href="{{ url_for('customer_instrument_detail', instrument_id=rel.instrument_id) }}">{{ rel.name }}</a>
+                    </h4>
+                    <div class="related-meta-row">
+                        <span class="related-price">₹{{ "{:,.2f}".format(rel.price) }}</span>
+                        <span class="stock-badge-mini {{ rel.stock_badge_class }}">{{ rel.stock_label }}</span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='js/instrument_synth.js') }}?v=20261125_iconic_v4"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.SoundCraftSynth && window.SoundCraftSynth.getTrackName) {
+            const track = SoundCraftSynth.getTrackName('{{ instrument.category }}', '{{ instrument.name }}', '{{ instrument.instrument_id }}');
+            const el = document.getElementById('iconicTrackTitle');
+            if (el && track) el.textContent = track;
+        }
+    });
+</script>
+{% endblock %}

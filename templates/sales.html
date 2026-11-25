@@ -1,0 +1,403 @@
+{% extends "base.html" %}
+
+{% block title %}Sales &amp; Stock Management{% endblock %}
+{% block page_title %}Sales &amp; Stock Management{% endblock %}
+
+{% block content %}
+<div class="sales-page-container">
+    <!-- Top Grid: Record Sale Card & Quick Metrics -->
+    <div class="sales-grid">
+        <!-- Record Sale Card (Task 1, 2, 3, 4, 5) -->
+        <div class="panel form-panel sales-form-panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <span class="panel-icon">💳</span>
+                    <h3>Process New Sale</h3>
+                </div>
+                <span class="panel-subtext">Record customer sale &amp; decrement inventory</span>
+            </div>
+
+            <div class="panel-body">
+                <form action="{{ url_for('sales_route') }}" method="POST" id="salesForm" class="instrument-form" onsubmit="return handleSalesSubmit(this)">
+                    <div class="sales-form-grid">
+                        <!-- Field 1: Sale ID (Auto-generated) -->
+                        <div class="form-group">
+                            <label for="sale_id_display" class="form-label">
+                                Prospective Sale ID <span class="tag-auto">Auto</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="sale_id_display" 
+                                class="form-control input-readonly" 
+                                value="#{{ next_sale_id }}" 
+                                readonly 
+                                disabled
+                            >
+                            <span class="form-hint">Generated automatically upon confirmation.</span>
+                        </div>
+
+                        <!-- Field 8: Current Sale Date -->
+                        <div class="form-group">
+                            <label for="sale_date_display" class="form-label">Sale Date &amp; Time</label>
+                            <input 
+                                type="text" 
+                                id="sale_date_display" 
+                                class="form-control input-readonly" 
+                                value="Today (Current Timestamp)" 
+                                readonly 
+                                disabled
+                            >
+                            <span class="form-hint">Recorded automatically in SQLite database.</span>
+                        </div>
+
+                        <!-- Field 2: Instrument Selection Dropdown (Task 2) -->
+                        <div class="form-group form-group-full">
+                            <label for="instrument_id" class="form-label">
+                                Select Musical Instrument <span class="required">*</span>
+                            </label>
+                            <select 
+                                id="instrument_id" 
+                                name="instrument_id" 
+                                class="form-select sales-select" 
+                                required 
+                                onchange="onInstrumentChange(this)"
+                            >
+                                <option value="" disabled selected>-- Choose an Instrument to Sell --</option>
+                                {% for inst in instruments %}
+                                <option 
+                                    value="{{ inst['instrument_id'] }}"
+                                    data-name="{{ inst['name'] }}"
+                                    data-brand="{{ inst['brand'] }}"
+                                    data-category="{{ inst['category'] }}"
+                                    data-price="{{ inst['price'] }}"
+                                    data-stock="{{ inst['quantity'] }}"
+                                    {% if inst['quantity'] == 0 %}class="opt-out-of-stock"{% endif %}
+                                >
+                                    {{ inst['name'] }} ({{ inst['brand'] }}) &bull; ${{ "%.2f"|format(inst['price']) }} &bull; 
+                                    {% if inst['quantity'] == 0 %}OUT OF STOCK{% else %}{{ inst['quantity'] }} in stock{% endif %}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <span class="form-hint">Select the item from the catalog to populate pricing and stock details.</span>
+                        </div>
+
+                        <!-- Field 3: Instrument Name (Display) -->
+                        <div class="form-group">
+                            <label for="display_name" class="form-label">Selected Instrument</label>
+                            <input 
+                                type="text" 
+                                id="display_name" 
+                                class="form-control input-readonly" 
+                                placeholder="Select an instrument above..." 
+                                readonly
+                            >
+                        </div>
+
+                        <!-- Field 4: Available Stock with Stock Status Badge -->
+                        <div class="form-group">
+                            <label class="form-label">Available Stock</label>
+                            <div class="stock-display-wrapper">
+                                <input 
+                                    type="text" 
+                                    id="display_stock" 
+                                    class="form-control input-readonly stock-num-input" 
+                                    value="-- units" 
+                                    readonly
+                                >
+                                <span id="stock_badge" class="badge-status badge-neutral">No selection</span>
+                            </div>
+                        </div>
+
+                        <!-- Field 6: Unit Price -->
+                        <div class="form-group">
+                            <label for="display_price" class="form-label">Unit Price ($)</label>
+                            <input 
+                                type="text" 
+                                id="display_price" 
+                                class="form-control input-readonly" 
+                                value="$0.00" 
+                                readonly
+                            >
+                        </div>
+
+                        <!-- Field 5: Quantity to Sell (Task 2 & 4) -->
+                        <div class="form-group">
+                            <label for="quantity" class="form-label">
+                                Quantity to Sell <span class="required">*</span>
+                            </label>
+                            <input 
+                                type="number" 
+                                id="quantity" 
+                                name="quantity" 
+                                class="form-control" 
+                                min="1" 
+                                step="1" 
+                                placeholder="e.g. 1" 
+                                required 
+                                oninput="calculateTotal()"
+                            >
+                            <span id="qty_hint" class="form-hint">Enter the number of units to sell.</span>
+                        </div>
+                    </div>
+
+                    <!-- Field 7: Live Total Amount Display Card (Task 3) -->
+                    <div class="total-calculation-card">
+                        <div class="total-left">
+                            <span class="total-label">Total Amount</span>
+                            <span class="total-formula" id="formula_text">0 units &times; $0.00</span>
+                        </div>
+                        <div class="total-right">
+                            <span class="total-currency">$</span>
+                            <span class="total-amount-value" id="display_total">0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons & Safety Notice -->
+                    <div class="form-actions sales-actions">
+                        <button type="submit" id="btnConfirmSale" class="btn btn-primary btn-sale-submit" disabled>
+                            <span class="btn-icon">💳</span> Confirm Sale
+                        </button>
+                        <a href="{{ url_for('manage_inventory') }}" class="btn btn-secondary">
+                            View Inventory
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sales Module Quick Summary Sidebar -->
+        <div class="sales-summary-sidebar">
+            <div class="panel highlight-panel">
+                <div class="panel-header">
+                    <div class="panel-title-group">
+                        <span class="panel-icon">💡</span>
+                        <h3>Sales Guide</h3>
+                    </div>
+                </div>
+                <div class="panel-body info-guide-body">
+                    <ul class="guide-list">
+                        <li>
+                            <strong>Automatic Stock Deduction:</strong> Deducts stock safely using atomic SQLite transactions.
+                        </li>
+                        <li>
+                            <strong>Live Valuation:</strong> Total amount automatically calculates as quantity changes.
+                        </li>
+                        <li>
+                            <strong>Stock Protection:</strong> Out-of-stock instruments cannot be sold. Exceeding stock is prevented.
+                        </li>
+                        <li>
+                            <strong>Instant Reporting:</strong> Every confirmed transaction updates Dashboard cards and Reports immediately.
+                        </li>
+                    </ul>
+
+                    <div class="quick-link-box">
+                        <a href="{{ url_for('reports_route') }}" class="btn btn-outline-primary btn-block">
+                            📊 View Sales Analytics &amp; Reports &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task 6: Sales History Section -->
+    <div class="panel history-panel">
+        <div class="panel-header">
+            <div class="panel-title-group">
+                <span class="panel-icon">📜</span>
+                <h3>Transaction History</h3>
+            </div>
+            <span class="panel-subtext">Showing {{ sales_history|length }} Completed Sales (Latest First)</span>
+        </div>
+
+        <div class="panel-body table-panel-body">
+            {% if sales_history and sales_history|length > 0 %}
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Sale ID</th>
+                            <th>Instrument</th>
+                            <th class="text-center">Quantity Sold</th>
+                            <th>Unit Price</th>
+                            <th>Total Amount</th>
+                            <th>Sale Date</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sale in sales_history %}
+                        <tr>
+                            <td class="col-id">#{{ sale['sale_id'] }}</td>
+                            <td class="col-name">
+                                <strong>{{ sale['instrument_name'] }}</strong>
+                                {% if sale['instrument_id'] %}
+                                <span class="sub-id">({{ sale['instrument_id'] }})</span>
+                                {% endif %}
+                            </td>
+                            <td class="col-qty text-center">
+                                <span class="badge-qty-sold">{{ sale['quantity_sold'] }}</span>
+                            </td>
+                            <td class="col-price">${{ "%.2f"|format(sale['unit_price']) }}</td>
+                            <td class="col-total">
+                                <strong class="text-success">${{ "%.2f"|format(sale['total_amount']) }}</strong>
+                            </td>
+                            <td class="col-date">{{ sale['sale_date'] }}</td>
+                            <td class="text-center">
+                                <span class="badge-status badge-in">Completed</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🛒</div>
+                <h4>No Sales Recorded Yet</h4>
+                <p>Use the form above to record your first customer sale. Transaction records will appear here immediately.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Task 3, 4, 5 Client-Side Logic -->
+<script>
+var currentPrice = 0.0;
+var currentStock = 0;
+var currentName = "";
+
+function onInstrumentChange(selectEl) {
+    var option = selectEl.options[selectEl.selectedIndex];
+    if (!option || !option.value) {
+        resetForm();
+        return;
+    }
+
+    currentName = option.getAttribute('data-name') || '';
+    currentPrice = parseFloat(option.getAttribute('data-price')) || 0.0;
+    currentStock = parseInt(option.getAttribute('data-stock'), 10) || 0;
+
+    document.getElementById('display_name').value = currentName;
+    document.getElementById('display_price').value = '$' + currentPrice.toFixed(2);
+    document.getElementById('display_stock').value = currentStock + ' units';
+
+    var badge = document.getElementById('stock_badge');
+    var qtyInput = document.getElementById('quantity');
+    var submitBtn = document.getElementById('btnConfirmSale');
+    var qtyHint = document.getElementById('qty_hint');
+
+    if (currentStock === 0) {
+        badge.className = 'badge-status badge-out';
+        badge.innerText = 'Out of Stock';
+        qtyInput.value = '';
+        qtyInput.disabled = true;
+        qtyInput.removeAttribute('max');
+        submitBtn.disabled = true;
+        qtyHint.innerText = 'This instrument is currently out of stock.';
+        qtyHint.style.color = '#ef4444';
+    } else {
+        if (currentStock <= 5) {
+            badge.className = 'badge-status badge-low';
+            badge.innerText = 'Low Stock (' + currentStock + ')';
+        } else {
+            badge.className = 'badge-status badge-in';
+            badge.innerText = 'Available (' + currentStock + ')';
+        }
+        qtyInput.disabled = false;
+        qtyInput.min = '1';
+        qtyInput.max = currentStock;
+        if (!qtyInput.value || parseInt(qtyInput.value, 10) > currentStock) {
+            qtyInput.value = 1;
+        }
+        qtyHint.innerText = 'Enter 1 to ' + currentStock + ' units.';
+        qtyHint.style.color = '';
+        submitBtn.disabled = false;
+    }
+
+    calculateTotal();
+}
+
+function calculateTotal() {
+    var qtyInput = document.getElementById('quantity');
+    var submitBtn = document.getElementById('btnConfirmSale');
+    var formulaText = document.getElementById('formula_text');
+    var totalText = document.getElementById('display_total');
+    var qtyHint = document.getElementById('qty_hint');
+
+    var qty = parseInt(qtyInput.value, 10);
+
+    if (isNaN(qty) || qty <= 0) {
+        formulaText.innerText = '0 units \u00d7 $' + currentPrice.toFixed(2);
+        totalText.innerText = '0.00';
+        submitBtn.disabled = true;
+        return;
+    }
+
+    if (currentStock > 0 && qty > currentStock) {
+        qtyHint.innerText = 'Cannot exceed available stock (' + currentStock + ' units)!';
+        qtyHint.style.color = '#ef4444';
+        submitBtn.disabled = true;
+    } else if (currentStock > 0) {
+        qtyHint.innerText = 'Enter 1 to ' + currentStock + ' units.';
+        qtyHint.style.color = '';
+        submitBtn.disabled = false;
+    }
+
+    var total = qty * currentPrice;
+    formulaText.innerText = qty + ' unit(s) \u00d7 $' + currentPrice.toFixed(2);
+    totalText.innerText = total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function resetForm() {
+    currentPrice = 0.0;
+    currentStock = 0;
+    currentName = "";
+    document.getElementById('display_name').value = '';
+    document.getElementById('display_price').value = '$0.00';
+    document.getElementById('display_stock').value = '-- units';
+    var badge = document.getElementById('stock_badge');
+    badge.className = 'badge-status badge-neutral';
+    badge.innerText = 'No selection';
+    var qtyInput = document.getElementById('quantity');
+    qtyInput.value = '';
+    qtyInput.disabled = false;
+    document.getElementById('btnConfirmSale').disabled = true;
+    document.getElementById('formula_text').innerText = '0 units \u00d7 $0.00';
+    document.getElementById('display_total').innerText = '0.00';
+}
+
+function handleSalesSubmit(form) {
+    var select = document.getElementById('instrument_id');
+    var qtyInput = document.getElementById('quantity');
+    var qty = parseInt(qtyInput.value, 10);
+
+    if (!select.value) {
+        alert('Please choose an instrument to sell.');
+        return false;
+    }
+
+    if (currentStock === 0) {
+        alert('Cannot sell an out-of-stock instrument.');
+        return false;
+    }
+
+    if (isNaN(qty) || qty <= 0) {
+        alert('Quantity to sell must be greater than zero.');
+        return false;
+    }
+
+    if (qty > currentStock) {
+        alert('Quantity cannot exceed available stock (' + currentStock + ').');
+        return false;
+    }
+
+    // Disable button to prevent duplicate submissions
+    var submitBtn = document.getElementById('btnConfirmSale');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="btn-icon">⏳</span> Processing Sale...';
+    return true;
+}
+</script>
+{% endblock %}

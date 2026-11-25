@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dashboard{% endblock %} - Musical Instrument Inventory</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-icon">🎵</div>
+                <div class="brand-details">
+                    <h2 class="brand-title">SoundCraft</h2>
+                    <span class="brand-subtitle">Instrument Inventory</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-menu">
+                <div class="menu-label">Main Menu</div>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('home') }}" class="menu-item {% if request.endpoint == 'home' %}active{% endif %}">
+                            <span class="menu-icon">📊</span>
+                            <span class="menu-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('add_instrument') }}" class="menu-item {% if request.endpoint == 'add_instrument' %}active{% endif %}">
+                            <span class="menu-icon">➕</span>
+                            <span class="menu-text">Add Instrument</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('manage_inventory') }}" class="menu-item {% if request.endpoint == 'manage_inventory' %}active{% endif %}">
+                            <span class="menu-icon">🎸</span>
+                            <span class="menu-text">Manage Inventory</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('search_instruments_route') }}" class="menu-item {% if request.endpoint == 'search_instruments_route' %}active{% endif %}">
+                            <span class="menu-icon">🔍</span>
+                            <span class="menu-text">Search Instruments</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('sales_route') }}" class="menu-item {% if request.endpoint == 'sales_route' %}active{% endif %}">
+                            <span class="menu-icon">🛒</span>
+                            <span class="menu-text">Sales</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('admin_orders') }}" class="menu-item {% if request.endpoint == 'admin_orders' %}active{% endif %}">
+                            <span class="menu-icon">📦</span>
+                            <span class="menu-text">Customer Orders</span>
+                            <span class="sidebar-live-pill" title="Live Customer Orders">LIVE</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('reports_route') }}" class="menu-item {% if request.endpoint == 'reports_route' %}active{% endif %}">
+                            <span class="menu-icon">📈</span>
+                            <span class="menu-text">Reports</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="menu-label">Administration & Store</div>
+                <ul>
+                    <li>
+                        <a href="{{ url_for('customer_store') }}" class="menu-item" target="_blank" title="Open Customer Storefront">
+                            <span class="menu-icon">🛍️</span>
+                            <span class="menu-text">Customer Store</span>
+                            <span class="sidebar-external-icon">↗</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('profile') }}" class="menu-item {% if request.endpoint == 'profile' %}active{% endif %}">
+                            <span class="menu-icon">👤</span>
+                            <span class="menu-text">Admin Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('change_password') }}" class="menu-item {% if request.endpoint == 'change_password' %}active{% endif %}">
+                            <span class="menu-icon">🔑</span>
+                            <span class="menu-text">Change Password</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="db-status-pill">
+                    <span class="status-indicator-dot"></span>
+                    <span class="status-indicator-text">SQLite: musical_inventory.db</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-wrapper">
+            <!-- Top Navigation Bar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h1 class="page-title">{% block page_title %}Dashboard Overview{% endblock %}</h1>
+                    <span class="page-breadcrumb">Musical Instrument Management System</span>
+                </div>
+                <div class="topbar-right">
+                    <a href="{{ url_for('profile') }}" class="user-profile-badge" title="Manage Admin Profile">
+                        <span class="user-avatar-icon">👤</span>
+                        <div class="user-meta-info">
+                            <span class="user-name-text">{{ session.get('full_name') or session.get('username', 'Admin') }}</span>
+                            <span class="user-role-tag">{{ session.get('role', 'Admin') }}</span>
+                        </div>
+                    </a>
+                    <a href="{{ url_for('change_password') }}" class="btn-topbar-action {% if request.endpoint == 'change_password' %}active{% endif %}" title="Change Password">
+                        <span>🔑</span>
+                        <span>Password</span>
+                    </a>
+                    <a href="{{ url_for('customer_store') }}" class="btn-topbar-action" title="View Customer Storefront">
+                        <span>🛍️</span>
+                        <span>Storefront</span>
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn-logout" title="Sign Out of Inventory System">
+                        <span>🚪</span>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Page Body -->
+            <main class="content-body">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    <div class="flash-messages-container">
+                        {% for category, message in messages %}
+                        <div class="flash-alert flash-{{ category }}">
+                            <span class="flash-icon">
+                                {% if category == 'success' %}✅{% else %}⚠️{% endif %}
+                            </span>
+                            <span class="flash-text">{{ message }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </main>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <p>&copy; 2026 Musical Instrument Inventory System &bull; Built with Python Flask &amp; SQLite</p>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>

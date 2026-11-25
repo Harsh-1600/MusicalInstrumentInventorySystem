@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad_fde047" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#78350f" />
+      <stop offset="100%" stop-color="#b45309" />
+    </linearGradient>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#cbd5e1" />
+      <stop offset="100%" stop-color="#94a3b8" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="400" height="300" rx="16" fill="url(#grad_fde047)" />
+
+  <!-- Background decorative rings -->
+  <circle cx="200" cy="140" r="110" fill="none" stroke="#fde047" stroke-opacity="0.15" stroke-width="2" />
+  <circle cx="200" cy="140" r="85" fill="none" stroke="#fde047" stroke-opacity="0.2" stroke-width="1.5" stroke-dasharray="6,4" />
+
+  <!-- Instrument Artwork -->
+  <g filter="url(#shadow)">
+    
+          <!-- Main Tube Loop -->
+          <rect x="100" y="115" width="160" height="25" rx="12" fill="none" stroke="#facc15" stroke-width="6"/>
+          <!-- Leadpipe & Mouthpiece -->
+          <line x1="80" y1="120" x2="110" y2="120" stroke="#eab308" stroke-width="5"/>
+          <polygon points="75,115 80,118 80,122 75,125" fill="#fef08a"/>
+          <!-- Bell Flare -->
+          <path d="M 260 135 L 310 100 L 315 155 L 260 142 Z" fill="#eab308" stroke="#fef08a" stroke-width="2"/>
+          <ellipse cx="312" cy="127" rx="6" ry="26" fill="#ca8a04" stroke="#fef08a" stroke-width="2"/>
+          <!-- 3 Valves -->
+          <rect x="175" y="85" width="8" height="40" rx="2" fill="#f8fafc" stroke="#a16207" stroke-width="1.5"/>
+          <rect x="190" y="85" width="8" height="40" rx="2" fill="#f8fafc" stroke="#a16207" stroke-width="1.5"/>
+          <rect x="205" y="85" width="8" height="40" rx="2" fill="#f8fafc" stroke="#a16207" stroke-width="1.5"/>
+          <!-- Valve buttons -->
+          <ellipse cx="179" cy="85" rx="5" ry="2" fill="#fef08a"/>
+          <ellipse cx="194" cy="85" rx="5" ry="2" fill="#fef08a"/>
+          <ellipse cx="209" cy="85" rx="5" ry="2" fill="#fef08a"/>
+        
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="20" y="246" width="360" height="38" rx="8" fill="rgba(15, 23, 42, 0.75)" backdrop-filter="blur(4px)" />
+  <text x="200" y="270" font-family="'Segoe UI', -apple-system, sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">
+    TRUMPET & HORN
+  </text>
+</svg>

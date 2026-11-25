@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Store{% endblock %} - SoundCraft Musical Store</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="customer-body">
+    <!-- Customer Navigation Header -->
+    <header class="customer-navbar">
+        <div class="customer-nav-container">
+            <!-- Brand Logo -->
+            <a href="{{ url_for('customer_store') }}" class="customer-brand">
+                <span class="customer-brand-icon">🎵</span>
+                <div class="customer-brand-text">
+                    <span class="customer-brand-name">SoundCraft</span>
+                    <span class="customer-brand-tagline">Musical Instruments Store</span>
+                </div>
+            </a>
+
+            <!-- Customer Search Bar -->
+            <form action="{{ url_for('customer_store') }}" method="GET" class="customer-nav-search">
+                <input 
+                    type="text" 
+                    name="search" 
+                    placeholder="Search instruments (e.g. Guitar, Piano, Tabla, Flute)..." 
+                    value="{{ search_query or '' }}"
+                    class="customer-search-input"
+                >
+                <button type="submit" class="customer-search-btn" title="Search">
+                    <span>🔍</span>
+                </button>
+            </form>
+
+            <!-- User Status & Actions -->
+            <div class="customer-nav-actions">
+                <a href="{{ url_for('customer_cart') }}" class="btn-customer-cart" title="Shopping Cart">
+                    <span class="cart-icon">🛒</span>
+                    <span class="cart-label">Cart</span>
+                    {% if cart_count and cart_count > 0 %}
+                    <span class="cart-badge">{{ cart_count }}</span>
+                    {% endif %}
+                </a>
+
+                {% if session.get('user_id') and session.get('role') == 'Customer' %}
+                    <div class="customer-user-badge">
+                        <span class="customer-user-avatar">👤</span>
+                        <div class="customer-user-info">
+                            <span class="customer-user-name">{{ session.get('full_name') or session.get('username') }}</span>
+                            <span class="customer-user-role">Customer Account</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('customer_orders') }}" class="btn-customer-portal-action" title="My Orders">
+                        <span>📦 My Orders</span>
+                    </a>
+                    <a href="{{ url_for('customer_profile') }}" class="btn-customer-portal-action" title="My Profile">
+                        <span>👤 Profile</span>
+                    </a>
+                    <a href="{{ url_for('customer_change_password') }}" class="btn-customer-portal-action" title="Change Password">
+                        <span>🔑 Password</span>
+                    </a>
+                    <a href="{{ url_for('customer_logout') }}" class="btn-customer-logout" title="Sign Out">
+                        <span>🚪 Sign Out</span>
+                    </a>
+                {% elif session.get('user_id') and session.get('role') == 'Admin' %}
+                    <div class="customer-user-badge admin-preview-badge">
+                        <span class="customer-user-avatar">🛡️</span>
+                        <div class="customer-user-info">
+                            <span class="customer-user-name">{{ session.get('full_name') or 'Administrator' }}</span>
+                            <span class="customer-user-role">Administrator</span>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('customer_orders') }}" class="btn-customer-portal-action" title="My Orders">
+                        <span>📦 My Orders</span>
+                    </a>
+                    <a href="{{ url_for('dashboard') }}" class="btn-customer-portal-action" title="Admin Dashboard">
+                        <span>📊 Admin Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('customer_logout') }}" class="btn-customer-logout" title="Sign Out">
+                        <span>🚪 Sign Out</span>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('customer_login') }}" class="btn-customer-signin">
+                        <span>Sign In</span>
+                    </a>
+                    <a href="{{ url_for('customer_register') }}" class="btn-customer-signup">
+                        <span>Register</span>
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn-admin-portal-link" title="Store Staff Portal">
+                        <span>🛡️ Staff Login</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Flash Messages Container -->
+    <div class="customer-main-wrapper">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="customer-flash-container">
+                {% for category, message in messages %}
+                <div class="flash-alert flash-{{ category }}">
+                    <span class="flash-icon">
+                        {% if category == 'success' %}✅{% elif category == 'info' %}ℹ️{% else %}⚠️{% endif %}
+                    </span>
+                    <span class="flash-text">{{ message }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Content Block -->
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Customer Footer -->
+    <footer class="customer-footer">
+        <div class="customer-footer-content">
+            <div class="footer-col">
+                <div class="customer-brand">
+                    <span class="customer-brand-icon">🎵</span>
+                    <span class="customer-brand-name">SoundCraft Instruments</span>
+                </div>
+                <p class="footer-desc">Crafting musical journeys with premium string, wind, brass, keyboard, and percussion instruments worldwide.</p>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-heading">Instrument Categories</h4>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('customer_store', category='String Instruments') }}">String Instruments</a></li>
+                    <li><a href="{{ url_for('customer_store', category='Keyboard Instruments') }}">Keyboards &amp; Pianos</a></li>
+                    <li><a href="{{ url_for('customer_store', category='Wind Instruments') }}">Wind &amp; Brass</a></li>
+                    <li><a href="{{ url_for('customer_store', category='Percussion Instruments') }}">Percussion &amp; Drums</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4 class="footer-heading">Store Navigation</h4>
+                <ul class="footer-links">
+                    <li><a href="{{ url_for('customer_store') }}">Browse All Instruments</a></li>
+                    <li><a href="{{ url_for('customer_login') }}">Customer Portal</a></li>
+                    <li><a href="{{ url_for('customer_register') }}">Create Free Account</a></li>
+                    <li><a href="{{ url_for('login') }}">Store Management Login</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 SoundCraft Musical Instruments &bull; Live Inventory System</p>
+        </div>
+    </footer>
+</body>
+</html>

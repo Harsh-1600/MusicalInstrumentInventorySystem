@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Registration - SoundCraft Musical Store</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="login-body">
+    <div class="login-wrapper">
+        <div class="login-card" style="max-width: 480px;">
+            <!-- Brand Header -->
+            <div class="login-header">
+                <div class="login-brand-icon">🎵</div>
+                <h1 class="login-title">Customer Registration</h1>
+                <h2 class="login-subtitle">Create Your Free SoundCraft Account</h2>
+                <p class="login-instructions">Register to browse 35+ musical instruments, check live inventory stock, and read comprehensive usage guides</p>
+            </div>
+
+            <!-- Flash Alert Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="login-flash-container">
+                    {% for category, message in messages %}
+                    <div class="flash-alert flash-{{ category }}">
+                        <span class="flash-icon">
+                            {% if category == 'success' %}✅{% elif category == 'info' %}ℹ️{% else %}⚠️{% endif %}
+                        </span>
+                        <span class="flash-text">{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Registration Form -->
+            <form action="{{ url_for('customer_register') }}" method="POST" class="login-form" novalidate>
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="full_name" class="form-label">Full Name</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">👤</span>
+                        <input 
+                            type="text" 
+                            id="full_name" 
+                            name="full_name" 
+                            class="form-control" 
+                            placeholder="e.g. John Doe"
+                            value="{{ full_name or '' }}"
+                            required 
+                            autofocus
+                        >
+                    </div>
+                </div>
+
+                <!-- Username -->
+                <div class="form-group">
+                    <label for="username" class="form-label">Choose Username</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">🏷️</span>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-control" 
+                            placeholder="e.g. johndoe"
+                            value="{{ username or '' }}"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">✉️</span>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-control" 
+                            placeholder="e.g. john@example.com"
+                            value="{{ email or '' }}"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password" class="form-label">Password (min. 6 chars)</label>
+                    <div class="input-with-icon password-input-group">
+                        <span class="input-icon">🔒</span>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            class="form-control" 
+                            placeholder="Enter password"
+                            required
+                        >
+                        <button 
+                            type="button" 
+                            class="password-toggle-btn" 
+                            data-target="password"
+                            title="Toggle Password Visibility"
+                        >
+                            <span>👁️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="confirm_password" class="form-label">Confirm Password</label>
+                    <div class="input-with-icon password-input-group">
+                        <span class="input-icon">🔁</span>
+                        <input 
+                            type="password" 
+                            id="confirm_password" 
+                            name="confirm_password" 
+                            class="form-control" 
+                            placeholder="Confirm password"
+                            required
+                        >
+                        <button 
+                            type="button" 
+                            class="password-toggle-btn" 
+                            data-target="confirm_password"
+                            title="Toggle Password Visibility"
+                        >
+                            <span>👁️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary btn-login-submit">
+                    <span>✨ Create My Account &amp; Sign In</span>
+                </button>
+            </form>
+
+            <!-- Login Link Prompt -->
+            <div class="auth-aux-links" style="margin-top: 16px;">
+                <span>Already have a customer account? </span>
+                <a href="{{ url_for('customer_login') }}" class="forgot-password-link" style="font-weight: 700;">
+                    Sign in here
+                </a>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="login-footer">
+                <p>&copy; 2026 SoundCraft &bull; Musical Instrument Inventory System</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toggle Password Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleButtons = document.querySelectorAll('.password-toggle-btn');
+            toggleButtons.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const targetId = this.getAttribute('data-target');
+                    const input = document.getElementById(targetId);
+                    const icon = this.querySelector('span');
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        icon.textContent = '🙈';
+                    } else {
+                        input.type = 'password';
+                        icon.textContent = '👁️';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

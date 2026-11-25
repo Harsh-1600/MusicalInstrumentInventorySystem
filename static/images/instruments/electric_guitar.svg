@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad_f43f5e" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#831843" />
+      <stop offset="100%" stop-color="#be185d" />
+    </linearGradient>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#cbd5e1" />
+      <stop offset="100%" stop-color="#94a3b8" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="400" height="300" rx="16" fill="url(#grad_f43f5e)" />
+
+  <!-- Background decorative rings -->
+  <circle cx="200" cy="140" r="110" fill="none" stroke="#f43f5e" stroke-opacity="0.15" stroke-width="2" />
+  <circle cx="200" cy="140" r="85" fill="none" stroke="#f43f5e" stroke-opacity="0.2" stroke-width="1.5" stroke-dasharray="6,4" />
+
+  <!-- Instrument Artwork -->
+  <g filter="url(#shadow)">
+    
+          <!-- Solid Body with Cutaways -->
+          <path d="M 160 180 C 140 140, 160 110, 180 120 C 170 100, 175 80, 185 85 C 190 105, 195 110, 200 110 C 205 110, 210 105, 215 85 C 225 80, 230 100, 220 120 C 240 110, 260 140, 240 180 C 230 215, 170 215, 160 180 Z" fill="#e11d48" stroke="#ffe4e6" stroke-width="2.5"/>
+          <!-- Pickguard -->
+          <path d="M 175 140 C 175 125, 195 130, 210 145 C 215 165, 200 190, 185 185 Z" fill="#ffffff" opacity="0.9"/>
+          <!-- Pickups -->
+          <rect x="190" y="135" width="20" height="6" rx="2" fill="#0f172a" stroke="#cbd5e1" stroke-width="1"/>
+          <rect x="190" y="150" width="20" height="6" rx="2" fill="#0f172a" stroke="#cbd5e1" stroke-width="1"/>
+          <!-- Bridge & Knobs -->
+          <rect x="192" y="175" width="16" height="8" rx="2" fill="#cbd5e1"/>
+          <circle cx="215" cy="180" r="3" fill="#fbbf24"/>
+          <circle cx="215" cy="190" r="3" fill="#fbbf24"/>
+          <!-- Neck & Fretboard -->
+          <rect x="195" y="35" width="10" height="85" fill="#fde68a" stroke="#78350f" stroke-width="1"/>
+          <polygon points="193,35 207,35 212,12 195,12" fill="#be185d" stroke="#ffe4e6" stroke-width="1"/>
+        
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="20" y="246" width="360" height="38" rx="8" fill="rgba(15, 23, 42, 0.75)" backdrop-filter="blur(4px)" />
+  <text x="200" y="270" font-family="'Segoe UI', -apple-system, sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">
+    ELECTRIC GUITAR
+  </text>
+</svg>

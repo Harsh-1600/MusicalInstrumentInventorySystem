@@ -1,0 +1,171 @@
+{% extends "customer/base_customer.html" %}
+
+{% block title %}My Customer Profile{% endblock %}
+
+{% block content %}
+<div class="store-container">
+    <!-- Breadcrumb & Top Bar -->
+    <div class="content-header-bar" style="margin-bottom: 24px;">
+        <div class="header-text-group">
+            <h2 class="section-title">👤 Customer Account Profile</h2>
+            <p class="section-subtitle">Manage your personal details, email preferences, and password security</p>
+        </div>
+        <div class="header-action-group">
+            <a href="{{ url_for('customer_change_password') }}" class="btn btn-outline-primary">
+                <span>🔑 Change Password</span>
+            </a>
+            <a href="{{ url_for('customer_store') }}" class="btn btn-outline-secondary">
+                <span>🛍️ Back to Storefront</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Profile Grid Layout -->
+    <div class="profile-layout-grid">
+        <!-- Column 1: Identity Card -->
+        <div class="profile-card profile-summary-card">
+            <div class="profile-avatar-wrapper">
+                <div class="profile-avatar-circle" style="background: linear-gradient(135deg, #0284c7, #0369a1);">
+                    <span class="avatar-emoji">👤</span>
+                </div>
+                <h3 class="profile-display-name">{{ user.full_name or user.username }}</h3>
+                <span class="profile-role-pill" style="background: #e0f2fe; color: #0369a1;">{{ user.role or 'Customer' }}</span>
+                <p class="profile-username-tag">@{{ user.username }}</p>
+            </div>
+
+            <div class="profile-meta-divider"></div>
+
+            <div class="profile-meta-list">
+                <div class="profile-meta-item">
+                    <span class="meta-label">📧 Email Address</span>
+                    <span class="meta-value">{{ user.email or 'Not specified' }}</span>
+                </div>
+                <div class="profile-meta-item">
+                    <span class="meta-label">🆔 Customer ID</span>
+                    <span class="meta-value">#{{ user.user_id }}</span>
+                </div>
+                <div class="profile-meta-item">
+                    <span class="meta-label">🛡️ Password Protection</span>
+                    <span class="meta-value text-success">PBKDF2-SHA256 Encrypted</span>
+                </div>
+                <div class="profile-meta-item">
+                    <span class="meta-label">📅 Member Since</span>
+                    <span class="meta-value">{{ user.created_at or 'SoundCraft Launch' }}</span>
+                </div>
+            </div>
+
+            <div class="profile-quick-action-box">
+                <a href="{{ url_for('customer_change_password') }}" class="btn btn-primary btn-block">
+                    <span>🔑 Change Password</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Column 2: Edit Form -->
+        <div class="profile-card profile-edit-card">
+            <div class="card-header-styled">
+                <div class="card-icon-box" style="background: #e0f2fe; color: #0284c7;">✏️</div>
+                <div>
+                    <h3 class="card-heading">Update Profile Information</h3>
+                    <p class="card-subheading">Update your full name and registered email address below</p>
+                </div>
+            </div>
+
+            <form action="{{ url_for('customer_profile') }}" method="POST" class="styled-form profile-form" novalidate>
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="full_name" class="form-label">
+                        <span>Full Name</span>
+                        <span class="required-star">*</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">👤</span>
+                        <input 
+                            type="text" 
+                            id="full_name" 
+                            name="full_name" 
+                            class="form-control" 
+                            placeholder="e.g. Priya Sharma"
+                            value="{{ user.full_name or '' }}"
+                            required
+                        >
+                    </div>
+                    <small class="form-hint">Your legal name for orders and customer inquiries.</small>
+                </div>
+
+                <!-- Username (Readonly) -->
+                <div class="form-group">
+                    <label for="username" class="form-label">
+                        <span>Username</span>
+                        <span class="lock-indicator" title="Username cannot be altered after account creation">🔒 Locked</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">🏷️</span>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            class="form-control form-control-locked" 
+                            value="{{ user.username }}"
+                            readonly
+                            disabled
+                        >
+                    </div>
+                    <small class="form-hint">Username is your permanent customer identifier.</small>
+                </div>
+
+                <!-- Email Address -->
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        <span>Email Address</span>
+                        <span class="required-star">*</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">✉️</span>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            class="form-control" 
+                            placeholder="customer@example.com"
+                            value="{{ user.email or '' }}"
+                            required
+                        >
+                    </div>
+                    <small class="form-hint">Used for order receipts, inquiries, and password reset links.</small>
+                </div>
+
+                <!-- Account Role (Readonly) -->
+                <div class="form-group">
+                    <label for="role" class="form-label">
+                        <span>Account Role</span>
+                        <span class="lock-indicator">🔒 Locked</span>
+                    </label>
+                    <div class="input-with-icon">
+                        <span class="input-icon">🏷️</span>
+                        <input 
+                            type="text" 
+                            id="role" 
+                            name="role" 
+                            class="form-control form-control-locked" 
+                            value="{{ user.role or 'Customer' }}"
+                            readonly
+                            disabled
+                        >
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="form-action-row" style="margin-top: 24px;">
+                    <button type="submit" class="btn btn-primary btn-save-profile">
+                        <span>💾 Save Profile Changes</span>
+                    </button>
+                    <a href="{{ url_for('customer_store') }}" class="btn btn-secondary">
+                        <span>Cancel</span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

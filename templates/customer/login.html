@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Login - SoundCraft Musical Store</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="pro-login-body customer-theme-body">
+
+    <!-- Ambient Glowing Background Grid -->
+    <div class="pro-ambient-glow pro-ambient-glow-1"></div>
+    <div class="pro-ambient-glow pro-ambient-glow-2"></div>
+    <div class="pro-grid-overlay"></div>
+
+    <!-- Top Navigation Bar -->
+    <header class="pro-portal-navbar">
+        <div class="pro-navbar-container">
+            <div class="pro-navbar-brand">
+                <div class="pro-brand-logo">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 18V5l12-2v13"></path>
+                        <circle cx="6" cy="18" r="3"></circle>
+                        <circle cx="18" cy="16" r="3"></circle>
+                    </svg>
+                </div>
+                <span class="pro-brand-name">SoundCraft</span>
+                <span class="pro-brand-badge store-badge">MUSIC STORE</span>
+            </div>
+            <nav class="pro-portal-tabs">
+                <a href="{{ url_for('customer_login') }}" class="pro-tab active store-tab" title="Customer Portal">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <path d="M16 10a4 4 0 0 1-8 0"></path>
+                    </svg>
+                    <span>Customer Store Login</span>
+                </a>
+                <a href="{{ url_for('login') }}" class="pro-tab" title="Administrator Portal">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                    <span>Admin Portal</span>
+                </a>
+                <a href="{{ url_for('customer_store') }}" class="pro-tab outline" target="_blank" title="Open Storefront">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    <span>View Storefront ↗</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Workspace Split Container -->
+    <main class="pro-workspace-layout">
+        <div class="pro-split-container">
+
+            <!-- LEFT COLUMN: Customer Experience Showcase -->
+            <section class="pro-showcase-panel">
+                <div class="showcase-header">
+                    <div class="pro-status-pill">
+                        <span class="live-pulse-dot"></span>
+                        <span>PREMIUM MUSIC EXPERIENCE &bull; 30+ INSTRUMENTS</span>
+                    </div>
+                    <h2 class="showcase-title">Handcrafted Instruments Delivered to Your Doorstep</h2>
+                    <p class="showcase-desc">
+                        Explore studio-grade guitars, keyboards, drums, violins, and traditional instruments with interactive audio demo previews and express shockproof delivery.
+                    </p>
+                </div>
+
+                <!-- 3 Customer Perks -->
+                <div class="showcase-kpi-row">
+                    <div class="kpi-mini-pill">
+                        <span class="kpi-val">🎧 Demo</span>
+                        <span class="kpi-lbl">Play Sound Online</span>
+                    </div>
+                    <div class="kpi-mini-pill">
+                        <span class="kpi-val">⚡ Fast</span>
+                        <span class="kpi-lbl">Express Delivery</span>
+                    </div>
+                    <div class="kpi-mini-pill">
+                        <span class="kpi-val">🛡️ 1-Year</span>
+                        <span class="kpi-lbl">Acoustic Warranty</span>
+                    </div>
+                </div>
+
+                <!-- Feature Highlights Card -->
+                <div class="pro-live-station-card">
+                    <div class="station-card-topbar">
+                        <div class="station-title-group">
+                            <span class="station-icon">🛍️</span>
+                            <span class="station-heading">Customer Benefits &amp; Services</span>
+                        </div>
+                        <span class="station-count-pill">Storefront Perks</span>
+                    </div>
+
+                    <div class="station-feed-wrapper" style="max-height: 200px;">
+                        <div class="feed-order-item">
+                            <div class="feed-thumb-wrap" style="display:flex;align-items:center;justify-content:center;font-size:1.3rem;">
+                                🎵
+                            </div>
+                            <div class="feed-details">
+                                <div class="feed-instrument-name" style="color:#ffffff;">Interactive Live Audio Demo</div>
+                                <div class="feed-customer-meta">Hear chords and notes for every instrument before ordering</div>
+                            </div>
+                        </div>
+
+                        <div class="feed-order-item">
+                            <div class="feed-thumb-wrap" style="display:flex;align-items:center;justify-content:center;font-size:1.3rem;">
+                                📱
+                            </div>
+                            <div class="feed-details">
+                                <div class="feed-instrument-name" style="color:#ffffff;">Real-Time Mobile Updates</div>
+                                <div class="feed-customer-meta">Store administrator sends instant WhatsApp order updates to your phone</div>
+                            </div>
+                        </div>
+
+                        <div class="feed-order-item">
+                            <div class="feed-thumb-wrap" style="display:flex;align-items:center;justify-content:center;font-size:1.3rem;">
+                                📦
+                            </div>
+                            <div class="feed-details">
+                                <div class="feed-instrument-name" style="color:#ffffff;">Shockproof Hard-Case Packaging</div>
+                                <div class="feed-customer-meta">Every guitar, drum, and violin is double-boxed with foam padding</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="station-bottom-note">
+                        <span>✨</span>
+                        <span>New musician? Create a free account on the right in 30 seconds</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT COLUMN: Centered Luxury Customer Sign In Card -->
+            <section class="pro-auth-panel">
+                <div class="pro-login-card">
+                    <div class="card-glow-bar"></div>
+
+                    <!-- Card Header -->
+                    <div class="pro-card-header">
+                        <div class="pro-shield-badge customer-badge-icon">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <path d="M16 10a4 4 0 0 1-8 0"></path>
+                            </svg>
+                        </div>
+                        <span class="pro-role-tag customer-tag">CUSTOMER STORE ACCESS</span>
+                        <h1 class="pro-card-title">Customer Sign In</h1>
+                        <p class="pro-card-subtitle">Sign in to check live stock, order instruments &amp; track deliveries</p>
+                    </div>
+
+                    <!-- Flash Alert Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        <div class="pro-flash-container">
+                            {% for category, message in messages %}
+                            <div class="pro-alert alert-{{ category }}">
+                                <span class="alert-icon">
+                                    {% if category == 'success' %}✓{% elif category == 'info' %}ℹ{% else %}⚠{% endif %}
+                                </span>
+                                <span class="alert-text">{{ message }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Customer Login Form -->
+                    <form action="{{ url_for('customer_login', next=request.args.get('next') or next) }}" method="POST" class="pro-login-form" novalidate>
+                        <input type="hidden" name="next" value="{{ request.args.get('next') or next or '' }}">
+
+                        <!-- Username -->
+                        <div class="pro-form-group">
+                            <label for="username" class="pro-form-label">Username</label>
+                            <div class="pro-input-wrap">
+                                <span class="pro-input-icon">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                </span>
+                                <input 
+                                    type="text" 
+                                    id="username" 
+                                    name="username" 
+                                    class="pro-form-input" 
+                                    placeholder="Enter customer username"
+                                    value="{{ username or '' }}"
+                                    required 
+                                    autofocus
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="pro-form-group">
+                            <div class="pro-label-row">
+                                <label for="password" class="pro-form-label">Password</label>
+                                <a href="{{ url_for('customer_forgot_password') }}" class="pro-forgot-link">Forgot Password?</a>
+                            </div>
+                            <div class="pro-input-wrap">
+                                <span class="pro-input-icon">
+                                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                </span>
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password" 
+                                    class="pro-form-input" 
+                                    placeholder="Enter customer password"
+                                    required
+                                >
+                                <button 
+                                    type="button" 
+                                    id="togglePasswordBtn" 
+                                    class="pro-pwd-toggle" 
+                                    title="Show / Hide Password"
+                                    aria-label="Toggle password visibility"
+                                >
+                                    <svg id="toggleIconSvg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Remember Me -->
+                        <div class="pro-remember-row">
+                            <label class="pro-checkbox-label">
+                                <input type="checkbox" name="remember_me" id="remember_me" class="pro-checkbox">
+                                <span>Keep me signed in</span>
+                            </label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="pro-submit-btn customer-btn">
+                            <span>Sign In &amp; Continue &rarr;</span>
+                        </button>
+                    </form>
+
+                    <!-- 1-Click Fast Autofill Demo Button -->
+                    <div class="pro-quickfill-wrap">
+                        <button type="button" class="pro-quickfill-btn" id="btnAutofillCustomer" title="Click to fill customer test credentials">
+                            <span>⚡</span>
+                            <span>Auto-fill Demo Customer (<code>customer</code> / <code>Customer@123</code>)</span>
+                        </button>
+                    </div>
+
+                    <!-- Registration Prompt Link -->
+                    <div class="pro-register-prompt">
+                        <span>New to SoundCraft?</span>
+                        <a href="{{ url_for('customer_register') }}" class="pro-register-link">Create your account here &rarr;</a>
+                    </div>
+
+                    <!-- Card Footer Security Badge -->
+                    <div class="pro-card-footer">
+                        <span class="sec-dot green"></span>
+                        <span>Secured with Encrypted Customer Credentials &bull; 256-bit Protection</span>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Interactive Scripts: Password Toggle & Autofill -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 1. Password Visibility Toggle
+            const toggleBtn = document.getElementById('togglePasswordBtn');
+            const passwordInput = document.getElementById('password');
+            const toggleSvg = document.getElementById('toggleIconSvg');
+            let isPasswordVisible = false;
+
+            if (toggleBtn && passwordInput) {
+                toggleBtn.addEventListener('click', function () {
+                    isPasswordVisible = !isPasswordVisible;
+                    if (isPasswordVisible) {
+                        passwordInput.type = 'text';
+                        toggleSvg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+                    } else {
+                        passwordInput.type = 'password';
+                        toggleSvg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+                    }
+                });
+            }
+
+            // 2. 1-Click Fast Autofill Customer Credentials
+            const autofillBtn = document.getElementById('btnAutofillCustomer');
+            if (autofillBtn) {
+                autofillBtn.addEventListener('click', function () {
+                    const u = document.getElementById('username');
+                    const p = document.getElementById('password');
+                    if (u && p) {
+                        u.value = 'customer';
+                        p.value = 'Customer@123';
+                        u.classList.add('input-fill-flash');
+                        p.classList.add('input-fill-flash');
+                        setTimeout(() => {
+                            u.classList.remove('input-fill-flash');
+                            p.classList.remove('input-fill-flash');
+                        }, 1000);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad_c084fc" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b0764" />
+      <stop offset="100%" stop-color="#581c87" />
+    </linearGradient>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc" />
+      <stop offset="50%" stop-color="#cbd5e1" />
+      <stop offset="100%" stop-color="#94a3b8" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="400" height="300" rx="16" fill="url(#grad_c084fc)" />
+
+  <!-- Background decorative rings -->
+  <circle cx="200" cy="140" r="110" fill="none" stroke="#c084fc" stroke-opacity="0.15" stroke-width="2" />
+  <circle cx="200" cy="140" r="85" fill="none" stroke="#c084fc" stroke-opacity="0.2" stroke-width="1.5" stroke-dasharray="6,4" />
+
+  <!-- Instrument Artwork -->
+  <g filter="url(#shadow)">
+    
+          <!-- Gourd Resonator (Kaddu) -->
+          <circle cx="130" cy="175" r="46" fill="#78350f" stroke="#fef08a" stroke-width="2.5"/>
+          <ellipse cx="130" cy="175" rx="34" ry="38" fill="#9a3412" stroke="#fbbf24" stroke-width="1.5"/>
+          <!-- Long Dandi Neck -->
+          <line x1="145" y1="165" x2="285" y2="55" stroke="#78350f" stroke-width="14" stroke-linecap="round"/>
+          <line x1="145" y1="165" x2="285" y2="55" stroke="#fef08a" stroke-width="2" stroke-linecap="round"/>
+          <!-- Curved Frets (Pardas) -->
+          <line x1="170" y1="145" x2="180" y2="135" stroke="#fde047" stroke-width="3" stroke-linecap="round"/><line x1="186" y1="132" x2="196" y2="122" stroke="#fde047" stroke-width="3" stroke-linecap="round"/><line x1="202" y1="119" x2="212" y2="109" stroke="#fde047" stroke-width="3" stroke-linecap="round"/><line x1="218" y1="106" x2="228" y2="96" stroke="#fde047" stroke-width="3" stroke-linecap="round"/><line x1="234" y1="93" x2="244" y2="83" stroke="#fde047" stroke-width="3" stroke-linecap="round"/><line x1="250" y1="80" x2="260" y2="70" stroke="#fde047" stroke-width="3" stroke-linecap="round"/><line x1="266" y1="67" x2="276" y2="57" stroke="#fde047" stroke-width="3" stroke-linecap="round"/>
+          <!-- Tuning Pegs (Kuntis) -->
+          <circle cx="270" cy="65" r="4" fill="#fbbf24"/>
+          <circle cx="280" cy="55" r="4" fill="#fbbf24"/>
+          <circle cx="290" cy="45" r="4" fill="#fbbf24"/>
+          <!-- Upper resonator (Tumba) -->
+          <circle cx="265" cy="45" r="16" fill="#9a3412" stroke="#fef08a" stroke-width="1.5"/>
+        
+  </g>
+
+  <!-- Title Badge -->
+  <rect x="20" y="246" width="360" height="38" rx="8" fill="rgba(15, 23, 42, 0.75)" backdrop-filter="blur(4px)" />
+  <text x="200" y="270" font-family="'Segoe UI', -apple-system, sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle" letter-spacing="0.5">
+    SITAR & VEENA
+  </text>
+</svg>

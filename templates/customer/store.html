@@ -1,0 +1,172 @@
+{% extends "customer/base_customer.html" %}
+
+{% block title %}Musical Instrument Catalog{% endblock %}
+
+{% block content %}
+<div class="store-container">
+    <!-- Storefront Hero Banner -->
+    <div class="store-hero">
+        <div class="store-hero-content">
+            <span class="store-hero-badge">🎵 Discover Your Sound</span>
+            <h1 class="store-hero-title">SoundCraft Musical Instrument Catalog</h1>
+            <p class="store-hero-subtitle">
+                Explore our curated collection of 35+ acoustic, brass, woodwind, percussion, and electronic instruments. Check live stock levels and click any instrument to read its dedicated <strong>Usage Guide ("Ethuku Use Pannalam")</strong>.
+            </p>
+
+            <!-- Quick Stock Metrics Pills (Interactive Clickable Filters) -->
+            <div class="store-metric-pills">
+                <a 
+                    href="{{ url_for('customer_store', category=current_category, search=search_query, stock='all') }}" 
+                    class="metric-pill pill-total {% if current_stock == 'all' or not current_stock %}active-pill{% endif %}"
+                    title="Click to view all {{ total_count }} instruments"
+                >
+                    <span class="metric-num">{{ total_count }}</span>
+                    <span class="metric-label">Total Instruments</span>
+                </a>
+                <a 
+                    href="{{ url_for('customer_store', category=current_category, search=search_query, stock='in_stock') }}" 
+                    class="metric-pill pill-in-stock {% if current_stock == 'in_stock' %}active-pill{% endif %}"
+                    title="Click to filter {{ in_stock_count }} instruments In Stock (>5 units)"
+                >
+                    <span class="metric-num">{{ in_stock_count }}</span>
+                    <span class="metric-label">🟢 In Stock (&gt;5 units)</span>
+                </a>
+                <a 
+                    href="{{ url_for('customer_store', category=current_category, search=search_query, stock='low_stock') }}" 
+                    class="metric-pill pill-low-stock {% if current_stock == 'low_stock' %}active-pill{% endif %}"
+                    title="Click to filter {{ low_stock_count }} instruments Low Stock (1–5 units)"
+                >
+                    <span class="metric-num">{{ low_stock_count }}</span>
+                    <span class="metric-label">🟡 Low Stock (1–5 units)</span>
+                </a>
+                <a 
+                    href="{{ url_for('customer_store', category=current_category, search=search_query, stock='out_of_stock') }}" 
+                    class="metric-pill pill-out-stock {% if current_stock == 'out_of_stock' %}active-pill{% endif %}"
+                    title="Click to filter {{ out_of_stock_count }} instruments Out of Stock (0 units)"
+                >
+                    <span class="metric-num">{{ out_of_stock_count }}</span>
+                    <span class="metric-label">🔴 Out of Stock (0 units)</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Filter Bar -->
+    <div class="store-filter-bar" id="catalogSection">
+        <div class="category-pills-list">
+            {% for cat in categories %}
+            <a 
+                href="{{ url_for('customer_store', category=cat, search=search_query, stock=current_stock) }}" 
+                class="category-pill-btn {% if current_category == cat %}active{% endif %}"
+            >
+                <span>
+                    {% if cat == 'All' %}🌐{% elif cat == 'String Instruments' %}🎸{% elif cat == 'Wind Instruments' %}🎷{% elif cat == 'Percussion Instruments' %}🥁{% elif cat == 'Keyboard Instruments' %}🎹{% elif cat == 'Electronic Instruments' %}🎛️{% else %}🎵{% endif %}
+                </span>
+                <span>{{ cat }}</span>
+            </a>
+            {% endfor %}
+        </div>
+
+        {% if search_query or (current_category and current_category != 'All') or (current_stock and current_stock != 'all') %}
+        <div class="store-filter-reset">
+            <span class="active-filter-text">
+                Showing results:
+                {% if current_category and current_category != 'All' %}<strong>{{ current_category }}</strong> &bull; {% endif %}
+                {% if current_stock == 'in_stock' %}<strong>🟢 In Stock Only (&gt;5)</strong> &bull; {% endif %}
+                {% if current_stock == 'low_stock' %}<strong>🟡 Low Stock Only (1–5)</strong> &bull; {% endif %}
+                {% if current_stock == 'out_of_stock' %}<strong>🔴 Out of Stock Only (0)</strong> &bull; {% endif %}
+                {% if search_query %}matching "<em>{{ search_query }}</em>" &bull; {% endif %}
+                <span class="filter-count-badge">({{ instruments|length }} items displayed)</span>
+            </span>
+            <a href="{{ url_for('customer_store') }}" class="btn-clear-filters">
+                <span>✕ Reset / Clear Filters</span>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Instruments Catalog Grid -->
+    {% if instruments %}
+    <div class="store-catalog-grid">
+        {% for item in instruments %}
+        <div class="instrument-card clickable-card" onclick="window.location='{{ url_for('customer_instrument_detail', instrument_id=item.instrument_id) }}'" role="button" tabindex="0">
+            <!-- Image Area -->
+            <a href="{{ url_for('customer_instrument_detail', instrument_id=item.instrument_id) }}" class="instrument-card-image-box" title="View details for {{ item.name }}">
+                <img 
+                    src="{% if item.image_url.startswith('/') or item.image_url.startswith('http') %}{{ item.image_url }}{% elif item.image_url.startswith('static/') %}/{{ item.image_url }}{% else %}{{ url_for('static', filename=item.image_url) }}{% endif %}" 
+                    alt="{{ item.name }}"
+                    class="instrument-card-img"
+                    loading="lazy"
+                >
+                <span class="instrument-category-badge">{{ item.category }}</span>
+                <span class="touch-hint-pill">👉 Tap to View</span>
+            </a>
+
+            <!-- Card Content -->
+            <div class="instrument-card-body">
+                <div class="instrument-card-header">
+                    <span class="instrument-brand-tag">{{ item.brand }}</span>
+                    <button type="button" class="btn-card-audio-preview" onclick="event.preventDefault(); event.stopPropagation(); SoundCraftSynth.previewCardSound('{{ item.category }}', '{{ item.name }}', this, '{{ item.instrument_id }}')" title="Preview sound of {{ item.name }}">
+                        <span>🔊 Audio</span>
+                    </button>
+                    <span class="instrument-id-tag">#{{ item.instrument_id }}</span>
+                </div>
+
+                <h3 class="instrument-title">
+                    <a href="{{ url_for('customer_instrument_detail', instrument_id=item.instrument_id) }}" class="instrument-title-link">
+                        {{ item.name }}
+                    </a>
+                </h3>
+
+                <!-- Price and Live Stock Status -->
+                <div class="instrument-price-stock-row">
+                    <div class="instrument-price">
+                        <span class="price-symbol">₹</span>{{ "{:,.2f}".format(item.price) }}
+                    </div>
+
+                    <div class="stock-badge {{ item.stock_badge_class }}">
+                        <span class="stock-dot"></span>
+                        <span>{{ item.stock_label }}</span>
+                    </div>
+                </div>
+
+                <!-- Usage Preview ("Ethuku Use Pannalam") -->
+                <div class="instrument-usage-preview">
+                    <span class="usage-preview-label">💡 Best For:</span>
+                    <p class="usage-preview-text">
+                        {{ item.use_case[:110] }}{% if item.use_case|length > 110 %}...{% endif %}
+                    </p>
+                </div>
+
+                <!-- Action Button Stack -->
+                <div class="instrument-card-action-dual">
+                    <a href="{{ url_for('customer_instrument_detail', instrument_id=item.instrument_id) }}" class="btn btn-view-instrument">
+                        <span>📖 Details &amp; Uses</span>
+                    </a>
+                    {% if item.quantity > 0 %}
+                    <a href="{{ url_for('customer_checkout_single', instrument_id=item.instrument_id) }}" class="btn btn-quick-order" onclick="event.stopPropagation()">
+                        <span>⚡ Order</span>
+                    </a>
+                    {% else %}
+                    <span class="btn-out-stock-pill" onclick="event.stopPropagation()">Sold Out</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="store-empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3 class="empty-title">No Instruments Found</h3>
+        <p class="empty-desc">We couldn't find any instruments matching your search criteria. Try a different category or clear filters.</p>
+        <a href="{{ url_for('customer_store') }}" class="btn btn-primary" style="margin-top: 16px;">
+            <span>Show All Instruments</span>
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='js/instrument_synth.js') }}?v=20261125_iconic_v4"></script>
+{% endblock %}

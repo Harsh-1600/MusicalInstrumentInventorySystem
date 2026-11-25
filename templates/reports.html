@@ -1,0 +1,497 @@
+{% extends "base.html" %}
+
+{% block title %}Reports &amp; Analytics{% endblock %}
+{% block page_title %}Reports &amp; Business Analytics{% endblock %}
+
+{% block content %}
+<div class="reports-page-container">
+    <!-- Top Action Toolbar: CSV Exports & Date Filtering (Task 8 & 9) -->
+    <div class="reports-toolbar">
+        <div class="toolbar-left">
+            <span class="report-subtitle-tag">Executive Summary &amp; Inventory Auditing</span>
+        </div>
+        <div class="toolbar-right export-btn-group">
+            <a href="{{ url_for('export_inventory_csv') }}" class="btn btn-export">
+                <span class="btn-icon">📥</span> Download Inventory CSV
+            </a>
+            <a href="{{ url_for('export_sales_csv', range=active_filter) }}" class="btn btn-export btn-export-sales">
+                <span class="btn-icon">📊</span> Download Sales CSV
+            </a>
+        </div>
+    </div>
+
+    <!-- Task 2: Inventory Summary Cards -->
+    <section class="summary-cards-section">
+        <div class="cards-grid reports-cards-grid">
+            <!-- Card 1: Total Instruments -->
+            <div class="summary-card card-blue">
+                <div class="card-icon-wrapper">
+                    <span class="card-emoji">🎸</span>
+                </div>
+                <div class="card-content">
+                    <span class="card-label">Total Instrument Types</span>
+                    <h3 class="card-value">{{ inventory_summary.total_instruments }}</h3>
+                    <span class="card-desc">Catalog entries in database</span>
+                </div>
+            </div>
+
+            <!-- Card 2: Total Stock Units -->
+            <div class="summary-card card-amber">
+                <div class="card-icon-wrapper">
+                    <span class="card-emoji">📦</span>
+                </div>
+                <div class="card-content">
+                    <span class="card-label">Total Stock Quantity</span>
+                    <h3 class="card-value">{{ inventory_summary.total_quantity }}</h3>
+                    <span class="card-desc">Units in storage warehouse</span>
+                </div>
+            </div>
+
+            <!-- Card 3: Total Inventory Valuation -->
+            <div class="summary-card card-green">
+                <div class="card-icon-wrapper">
+                    <span class="card-emoji">💰</span>
+                </div>
+                <div class="card-content">
+                    <span class="card-label">Total Inventory Value</span>
+                    <h3 class="card-value">${{ "%.2f"|format(inventory_summary.total_inventory_value) }}</h3>
+                    <span class="card-desc">Cumulative asset valuation</span>
+                </div>
+            </div>
+
+            <!-- Card 4: Stock Health Overview -->
+            <div class="summary-card card-purple stock-health-card">
+                <div class="card-icon-wrapper">
+                    <span class="card-emoji">🩺</span>
+                </div>
+                <div class="card-content">
+                    <span class="card-label">Stock Status Health</span>
+                    <div class="health-indicators">
+                        <span class="health-pill pill-available" title="Quantity > 5 units">
+                            <strong>{{ inventory_summary.available_count }}</strong> Available
+                        </span>
+                        <span class="health-pill pill-low" title="Quantity between 1 and 5 units">
+                            <strong>{{ inventory_summary.low_stock_count }}</strong> Low Stock
+                        </span>
+                        <span class="health-pill pill-out" title="Quantity is 0 units">
+                            <strong>{{ inventory_summary.out_of_stock_count }}</strong> Out of Stock
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Task 7: Charts and Visualizations (Chart.js) -->
+    <section class="charts-section">
+        <div class="charts-grid">
+            <!-- Chart 1: Category Stock Distribution -->
+            <div class="panel chart-panel">
+                <div class="panel-header">
+                    <div class="panel-title-group">
+                        <span class="panel-icon">📊</span>
+                        <h3>Category Stock Distribution</h3>
+                    </div>
+                    <span class="panel-subtext">Units per category</span>
+                </div>
+                <div class="panel-body chart-body">
+                    <canvas id="categoryChart" height="230"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Stock Availability Breakdown -->
+            <div class="panel chart-panel">
+                <div class="panel-header">
+                    <div class="panel-title-group">
+                        <span class="panel-icon">🍩</span>
+                        <h3>Stock Availability Health</h3>
+                    </div>
+                    <span class="panel-subtext">Stock condition ratios</span>
+                </div>
+                <div class="panel-body chart-body">
+                    <canvas id="availabilityChart" height="230"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 3: Sales Trend & Revenue -->
+            <div class="panel chart-panel chart-panel-full">
+                <div class="panel-header">
+                    <div class="panel-title-group">
+                        <span class="panel-icon">📈</span>
+                        <h3>Sales Revenue Timeline</h3>
+                    </div>
+                    <span class="panel-subtext">Daily revenue from completed transactions</span>
+                </div>
+                <div class="panel-body chart-body">
+                    <canvas id="salesTrendChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Task 3: Category-Wise Report -->
+    <section class="reports-section">
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <span class="panel-icon">🎼</span>
+                    <h3>Category-Wise Instrument Inventory Report</h3>
+                </div>
+                <span class="panel-subtext">Breakdown by musical classification</span>
+            </div>
+
+            <div class="panel-body table-panel-body">
+                {% if category_report and category_report|length > 0 %}
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Category Name</th>
+                                <th class="text-center">Unique Instruments</th>
+                                <th class="text-center">Total Stock Quantity</th>
+                                <th class="text-right">Total Stock Value ($)</th>
+                                <th class="text-center">Share of Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in category_report %}
+                            <tr>
+                                <td class="col-name">
+                                    <span class="tag-category">{{ cat['category'] }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <strong>{{ cat['instrument_count'] }}</strong> types
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge-qty-bold">{{ cat['total_quantity'] }} units</span>
+                                </td>
+                                <td class="text-right font-mono">
+                                    <strong>${{ "%.2f"|format(cat['total_value']) }}</strong>
+                                </td>
+                                <td class="text-center">
+                                    {% if inventory_summary.total_inventory_value > 0 %}
+                                    <div class="progress-bar-wrapper">
+                                        <div class="progress-bar-fill" style="width: {{ '%.1f'|format((cat['total_value'] / inventory_summary.total_inventory_value) * 100) }}%;"></div>
+                                        <span class="progress-bar-label">{{ "%.1f"|format((cat['total_value'] / inventory_summary.total_inventory_value) * 100) }}%</span>
+                                    </div>
+                                    {% else %}
+                                    0%
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <p>No inventory categories recorded yet.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Task 4: Low Stock and Out-of-Stock Reports -->
+    <section class="reports-section dual-table-section">
+        <div class="dual-grid">
+            <!-- Low Stock Panel (1-5 units) -->
+            <div class="panel panel-warning-outline">
+                <div class="panel-header">
+                    <div class="panel-title-group">
+                        <span class="panel-icon">⚠️</span>
+                        <h3>Low Stock Instruments (1 to 5 units)</h3>
+                    </div>
+                    <span class="badge-count badge-warning">{{ low_stock|length }}</span>
+                </div>
+
+                <div class="panel-body table-panel-body">
+                    {% if low_stock and low_stock|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="data-table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Brand</th>
+                                    <th>Available Qty</th>
+                                    <th>Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in low_stock %}
+                                <tr>
+                                    <td class="col-id">{% if item['instrument_id']|string|first in '0123456789' %}#{{ item['instrument_id'] }}{% else %}{{ item['instrument_id'] }}{% endif %}</td>
+                                    <td><strong>{{ item['name'] }}</strong></td>
+                                    <td>{{ item['brand'] }}</td>
+                                    <td>
+                                        <span class="badge-status badge-low">{{ item['quantity'] }} left</span>
+                                    </td>
+                                    <td>${{ "%.2f"|format(item['price']) }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state-mini">
+                        <span class="check-icon">✅</span>
+                        <p>No instruments in low-stock alert status.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Out of Stock Panel (0 units) -->
+            <div class="panel panel-danger-outline">
+                <div class="panel-header">
+                    <div class="panel-title-group">
+                        <span class="panel-icon">🚫</span>
+                        <h3>Out-of-Stock Instruments (0 units)</h3>
+                    </div>
+                    <span class="badge-count badge-danger">{{ out_of_stock|length }}</span>
+                </div>
+
+                <div class="panel-body table-panel-body">
+                    {% if out_of_stock and out_of_stock|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="data-table table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Brand</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in out_of_stock %}
+                                <tr>
+                                    <td class="col-id">{% if item['instrument_id']|string|first in '0123456789' %}#{{ item['instrument_id'] }}{% else %}{{ item['instrument_id'] }}{% endif %}</td>
+                                    <td><strong>{{ item['name'] }}</strong></td>
+                                    <td>{{ item['brand'] }}</td>
+                                    <td>${{ "%.2f"|format(item['price']) }}</td>
+                                    <td>
+                                        <span class="badge-status badge-out">0 Stock</span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="empty-state-mini">
+                        <span class="check-icon">🎉</span>
+                        <p>All catalog instruments have active warehouse stock.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Task 5 & 6: Sales Report with Date Filters -->
+    <section class="reports-section">
+        <div class="panel">
+            <div class="panel-header sales-header-flex">
+                <div class="panel-title-group">
+                    <span class="panel-icon">💳</span>
+                    <h3>Sales &amp; Revenue Report</h3>
+                </div>
+
+                <!-- Task 6: Filter Tabs -->
+                <div class="filter-tabs">
+                    <a href="{{ url_for('reports_route', range='all') }}" class="tab-btn {% if active_filter == 'all' %}active{% endif %}">
+                        All Time
+                    </a>
+                    <a href="{{ url_for('reports_route', range='today') }}" class="tab-btn {% if active_filter == 'today' %}active{% endif %}">
+                        Today
+                    </a>
+                    <a href="{{ url_for('reports_route', range='7days') }}" class="tab-btn {% if active_filter == '7days' %}active{% endif %}">
+                        Last 7 Days
+                    </a>
+                    <a href="{{ url_for('reports_route', range='30days') }}" class="tab-btn {% if active_filter == '30days' %}active{% endif %}">
+                        Last 30 Days
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sales Summary KPI Cards -->
+            <div class="sales-kpi-bar">
+                <div class="kpi-box">
+                    <span class="kpi-label">Total Transactions</span>
+                    <strong class="kpi-value">{{ sales_report.total_sales }}</strong>
+                </div>
+                <div class="kpi-box">
+                    <span class="kpi-label">Units Sold</span>
+                    <strong class="kpi-value">{{ sales_report.total_items_sold }}</strong>
+                </div>
+                <div class="kpi-box highlight-kpi">
+                    <span class="kpi-label">Total Sales Revenue</span>
+                    <strong class="kpi-value">${{ "%.2f"|format(sales_report.total_sales_amount) }}</strong>
+                </div>
+            </div>
+
+            <!-- Detailed Sales History Table -->
+            <div class="panel-body table-panel-body">
+                {% if sales_report.sales_records and sales_report.sales_records|length > 0 %}
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Sale ID</th>
+                                <th>Instrument Name</th>
+                                <th class="text-center">Quantity Sold</th>
+                                <th>Unit Price</th>
+                                <th>Total Amount</th>
+                                <th>Sale Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in sales_report.sales_records %}
+                            <tr>
+                                <td class="col-id">#{{ sale['sale_id'] }}</td>
+                                <td class="col-name">
+                                    <strong>{{ sale['instrument_name'] }}</strong>
+                                    {% if sale['instrument_id'] %}
+                                    <span class="sub-id">({{ sale['instrument_id'] }})</span>
+                                    {% endif %}
+                                </td>
+                                <td class="col-qty text-center">
+                                    <span class="badge-qty-sold">{{ sale['quantity_sold'] }}</span>
+                                </td>
+                                <td class="col-price">${{ "%.2f"|format(sale['unit_price']) }}</td>
+                                <td class="col-total">
+                                    <strong class="text-success">${{ "%.2f"|format(sale['total_amount']) }}</strong>
+                                </td>
+                                <td class="col-date">{{ sale['sale_date'] }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🛒</div>
+                    <h4>No Sales Found for this Filter</h4>
+                    <p>There are no recorded sales transactions matching the "<strong>{{ active_filter|upper }}</strong>" timeframe.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Task 7: Chart.js CDN & Interactive Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Category Stock Distribution (Bar Chart)
+    var catCtx = document.getElementById('categoryChart');
+    if (catCtx) {
+        new Chart(catCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: {{ chart_data.category_labels|tojson }},
+                datasets: [{
+                    label: 'Stock Units',
+                    data: {{ chart_data.category_quantities|tojson }},
+                    backgroundColor: [
+                        '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#64748b'
+                    ],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            afterLabel: function(context) {
+                                var vals = {{ chart_data.category_values|tojson }};
+                                return 'Valuation: $' + vals[context.dataIndex].toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 5 }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. Stock Availability Health (Doughnut Chart)
+    var availCtx = document.getElementById('availabilityChart');
+    if (availCtx) {
+        new Chart(availCtx.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: {{ chart_data.availability_labels|tojson }},
+                datasets: [{
+                    data: {{ chart_data.availability_counts|tojson }},
+                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                    borderWidth: 2,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { boxWidth: 12, padding: 14 }
+                    }
+                }
+            }
+        });
+    }
+
+    // 3. Sales Trend Timeline (Line / Bar Chart)
+    var salesTrendCtx = document.getElementById('salesTrendChart');
+    if (salesTrendCtx) {
+        var salesDates = {{ chart_data.sales_dates|tojson }};
+        var salesRevenues = {{ chart_data.sales_revenues|tojson }};
+
+        new Chart(salesTrendCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: salesDates.length > 0 ? salesDates : ['No recent sales'],
+                datasets: [{
+                    label: 'Daily Revenue ($)',
+                    data: salesRevenues.length > 0 ? salesRevenues : [0],
+                    borderColor: '#7c3aed',
+                    backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 5,
+                    pointBackgroundColor: '#7c3aed'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(val) { return '$' + val; }
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

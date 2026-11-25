@@ -1,0 +1,317 @@
+{% extends "customer/base_customer.html" %}
+
+{% block title %}Checkout & Order Placement{% endblock %}
+
+{% block content %}
+<div class="store-container">
+    <!-- Breadcrumb & Header -->
+    <div class="content-header-bar" style="margin-bottom: 24px;">
+        <div class="header-text-group">
+            <h2 class="section-title">📦 Complete Your Instrument Order</h2>
+            <p class="section-subtitle">Review your selected items, provide delivery details, and confirm purchase</p>
+        </div>
+        <div class="header-action-group">
+            {% if is_cart_checkout %}
+            <a href="{{ url_for('customer_cart') }}" class="btn btn-outline-secondary">
+                <span>🛒 Back to Cart</span>
+            </a>
+            {% else %}
+            <a href="{{ url_for('customer_instrument_detail', instrument_id=instrument.instrument_id) }}" class="btn btn-outline-secondary">
+                <span>← Back to {{ instrument.name }}</span>
+            </a>
+            {% endif %}
+            <a href="{{ url_for('customer_store') }}" class="btn btn-outline-secondary">
+                <span>🛍️ Storefront</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- 2-Column Checkout Layout -->
+    <div class="checkout-layout-grid">
+        <!-- Left Column: Delivery & Payment Details Form -->
+        <div class="checkout-form-column">
+            <form 
+                action="{% if is_cart_checkout %}{{ url_for('customer_cart_checkout') }}{% else %}{{ url_for('customer_checkout_single', instrument_id=instrument.instrument_id) }}{% endif %}" 
+                method="POST" 
+                class="checkout-styled-form"
+                id="checkoutForm"
+            >
+                {% if not is_cart_checkout %}
+                <input type="hidden" name="quantity" value="{{ quantity }}">
+                {% endif %}
+
+                <!-- Card 1: Delivery Address -->
+                <div class="checkout-card">
+                    <div class="checkout-card-header">
+                        <span class="checkout-step-badge">1</span>
+                        <div>
+                            <h3 class="checkout-card-title">Shipping &amp; Delivery Address</h3>
+                            <p class="checkout-card-subtitle">Where should we deliver your musical instrument?</p>
+                        </div>
+                    </div>
+
+                    <div class="checkout-card-body">
+                        <div class="form-row-dual">
+                            <!-- Customer Name -->
+                            <div class="form-group">
+                                <label for="customer_name" class="form-label">Recipient Full Name <span class="required-star">*</span></label>
+                                <div class="input-with-icon">
+                                    <span class="input-icon">👤</span>
+                                    <input 
+                                        type="text" 
+                                        id="customer_name" 
+                                        name="customer_name" 
+                                        class="form-control" 
+                                        placeholder="Full Name"
+                                        value="{{ user.full_name or '' }}"
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Phone Number -->
+                            <div class="form-group">
+                                <label for="phone_number" class="form-label">
+                                    Contact Phone Number <span class="required-star">*</span>
+                                    <span style="font-size: 0.78rem; font-weight: normal; color: #16a34a; margin-left: 6px;">📱 Instant SMS &amp; WhatsApp Notification</span>
+                                </label>
+                                <div class="input-with-icon">
+                                    <span class="input-icon">📞</span>
+                                    <input 
+                                        type="tel" 
+                                        id="phone_number" 
+                                        name="phone_number" 
+                                        class="form-control" 
+                                        placeholder="Enter 10-digit mobile number (e.g. 9876543210)"
+                                        value="{{ phone_number or session.get('customer_phone') or '' }}"
+                                        pattern="[6-9][0-9]{9}"
+                                        maxlength="10"
+                                        title="Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9"
+                                        required
+                                        autofocus
+                                    >
+                                </div>
+                                <small style="display: block; margin-top: 4px; font-size: 0.76rem; color: #64748b;">
+                                    Order confirmation message &amp; WhatsApp tracking updates will be sent to this number upon placing your order.
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Email Address -->
+                        <div class="form-group">
+                            <label for="customer_email" class="form-label">Email for Digital Invoice <span class="required-star">*</span></label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">✉️</span>
+                                <input 
+                                    type="email" 
+                                    id="customer_email" 
+                                    name="customer_email" 
+                                    class="form-control" 
+                                    placeholder="your-email@example.com"
+                                    value="{{ user.email or '' }}"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Street Address -->
+                        <div class="form-group">
+                            <label for="shipping_address" class="form-label">Delivery Street Address <span class="required-star">*</span></label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">🏠</span>
+                                <textarea 
+                                    id="shipping_address" 
+                                    name="shipping_address" 
+                                    class="form-control" 
+                                    rows="2" 
+                                    placeholder="Flat / House No., Apartment, Street, Landmark"
+                                    required
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <div class="form-row-dual">
+                            <!-- City -->
+                            <div class="form-group">
+                                <label for="city" class="form-label">City / Town <span class="required-star">*</span></label>
+                                <div class="input-with-icon">
+                                    <span class="input-icon">🏙️</span>
+                                    <input 
+                                        type="text" 
+                                        id="city" 
+                                        name="city" 
+                                        class="form-control" 
+                                        placeholder="e.g. Chennai"
+                                        required
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- Pincode -->
+                            <div class="form-group">
+                                <label for="pincode" class="form-label">Postal Pincode <span class="required-star">*</span></label>
+                                <div class="input-with-icon">
+                                    <span class="input-icon">📮</span>
+                                    <input 
+                                        type="text" 
+                                        id="pincode" 
+                                        name="pincode" 
+                                        class="form-control" 
+                                        placeholder="e.g. 600001"
+                                        required
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Payment Method -->
+                <div class="checkout-card" style="margin-top: 20px;">
+                    <div class="checkout-card-header">
+                        <span class="checkout-step-badge">2</span>
+                        <div>
+                            <h3 class="checkout-card-title">Payment Method</h3>
+                            <p class="checkout-card-subtitle">Choose how you'd like to pay for your instrument</p>
+                        </div>
+                    </div>
+
+                    <div class="checkout-card-body">
+                        <div class="payment-options-grid">
+                            <!-- Option 1: Cash on Delivery -->
+                            <label class="payment-option-card">
+                                <input type="radio" name="payment_method" value="Cash on Delivery" checked class="payment-radio">
+                                <div class="payment-content">
+                                    <div class="payment-icon">💵</div>
+                                    <div class="payment-meta">
+                                        <div class="payment-title">Cash on Delivery (COD)</div>
+                                        <div class="payment-desc">Pay cash or scan UPI when your instrument arrives at your doorstep</div>
+                                    </div>
+                                    <span class="payment-badge">Recommended</span>
+                                </div>
+                            </label>
+
+                            <!-- Option 2: UPI / GPay / PhonePe -->
+                            <label class="payment-option-card">
+                                <input type="radio" name="payment_method" value="UPI / GPay / PhonePe (Simulated)" class="payment-radio">
+                                <div class="payment-content">
+                                    <div class="payment-icon">📱</div>
+                                    <div class="payment-meta">
+                                        <div class="payment-title">Instant UPI / QR Code</div>
+                                        <div class="payment-desc">Google Pay, PhonePe, Paytm, BHIM (Zero transaction fees)</div>
+                                    </div>
+                                </div>
+                            </label>
+
+                            <!-- Option 3: Card Payment -->
+                            <label class="payment-option-card">
+                                <input type="radio" name="payment_method" value="Debit / Credit Card (Simulated)" class="payment-radio">
+                                <div class="payment-content">
+                                    <div class="payment-icon">💳</div>
+                                    <div class="payment-meta">
+                                        <div class="payment-title">Credit / Debit Card</div>
+                                        <div class="payment-desc">Visa, Mastercard, RuPay, Maestro</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="checkout-submit-row" style="margin-top: 24px;">
+                    <button type="submit" class="btn btn-confirm-order" id="confirmOrderBtn">
+                        <span>✅ Confirm &amp; Place Order (₹{{ "{:,.2f}".format(grand_total) }})</span>
+                    </button>
+                    <p class="checkout-guarantee-text">
+                        🛡️ 100% Secure Checkout &bull; Free Transit Insurance &bull; Direct Brand Warranty
+                    </p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Column: Order Summary Box -->
+        <div class="checkout-summary-column">
+            <div class="order-summary-card">
+                <h3 class="order-summary-title">
+                    <span>🧾 Order Summary</span>
+                    {% if is_cart_checkout %}
+                    <span class="summary-count-badge">{{ total_count }} item(s)</span>
+                    {% endif %}
+                </h3>
+
+                <div class="summary-items-list">
+                    {% if is_cart_checkout %}
+                        {% for item in cart_items %}
+                        <div class="summary-item-row">
+                            <div class="summary-item-img-box">
+                                <img 
+                                    src="{% if item.image_url.startswith('/') or item.image_url.startswith('http') %}{{ item.image_url }}{% elif item.image_url.startswith('static/') %}/{{ item.image_url }}{% else %}{{ url_for('static', filename=item.image_url) }}{% endif %}" 
+                                    alt="{{ item.name }}"
+                                    class="summary-thumb"
+                                >
+                                <span class="summary-qty-bubble">x{{ item.cart_quantity }}</span>
+                            </div>
+                            <div class="summary-item-info">
+                                <h4 class="summary-item-name">{{ item.name }}</h4>
+                                <div class="summary-item-brand">{{ item.brand }} &bull; {{ item.category }}</div>
+                                <div class="summary-item-price">₹{{ "{:,.2f}".format(item.subtotal) }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="summary-item-row">
+                            <div class="summary-item-img-box">
+                                <img 
+                                    src="{% if instrument.image_url.startswith('/') or instrument.image_url.startswith('http') %}{{ instrument.image_url }}{% elif instrument.image_url.startswith('static/') %}/{{ instrument.image_url }}{% else %}{{ url_for('static', filename=instrument.image_url) }}{% endif %}" 
+                                    alt="{{ instrument.name }}"
+                                    class="summary-thumb"
+                                >
+                                <span class="summary-qty-bubble">x{{ quantity }}</span>
+                            </div>
+                            <div class="summary-item-info">
+                                <h4 class="summary-item-name">{{ instrument.name }}</h4>
+                                <div class="summary-item-brand">{{ instrument.brand }} &bull; {{ instrument.category }}</div>
+                                <div class="summary-unit-calc">
+                                    {{ quantity }} &times; ₹{{ "{:,.2f}".format(instrument.price) }}
+                                </div>
+                                <div class="summary-item-price">₹{{ "{:,.2f}".format(subtotal) }}</div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <!-- Price Calculations -->
+                <div class="summary-calc-rows">
+                    <div class="calc-row">
+                        <span>Items Subtotal</span>
+                        <span>₹{{ "{:,.2f}".format(grand_total) }}</span>
+                    </div>
+                    <div class="calc-row text-success">
+                        <span>Delivery &amp; Courier Handling</span>
+                        <span><strong>FREE (₹0.00)</strong></span>
+                    </div>
+                    <div class="calc-row">
+                        <span>Transit Loss Insurance</span>
+                        <span><strong>Complimentary</strong></span>
+                    </div>
+                    <div class="calc-row calc-total-row">
+                        <span>Total Payable Amount</span>
+                        <span class="calc-grand-total">₹{{ "{:,.2f}".format(grand_total) }}</span>
+                    </div>
+                </div>
+
+                <div class="summary-safety-box">
+                    <div class="safety-icon">📦</div>
+                    <div class="safety-text">
+                        <strong>Safe Delivery Guaranteed:</strong>
+                        All instruments are safely boxed in multi-layer shockproof packing and tuned before dispatch.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
