@@ -26,7 +26,7 @@ def main():
 
     print(f"Connecting to {args.url}...")
     try:
-        porcelain.push(repo, remote_url, refspecs=[b"refs/heads/main:refs/heads/main"])
+        porcelain.push(repo, remote_url, refspecs=[b"refs/heads/main:refs/heads/main"], force=True)
         print("[SUCCESS] All files and backend code successfully pushed to GitHub!")
     except Exception as e:
         print(f"[ERROR] Push failed: {e}")
